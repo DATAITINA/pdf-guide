@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { processPaystackWebhook } from "@/lib/store/payments";
+import { processPaystackWebhook } from "@/lib/store/paystack-webhook.server";
 
 export const Route = createFileRoute("/api/paystack/webhook")({
   server: {
