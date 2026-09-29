@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getSql } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth/verify.server";
-import { loadTransferProof } from "@/lib/store/downloads";
+import { loadTransferProof } from "@/lib/store/downloads.server";
 
 export const Route = createFileRoute("/api/admin/proof/$orderId")({
   server: {
