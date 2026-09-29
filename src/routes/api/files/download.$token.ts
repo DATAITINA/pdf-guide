@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { loadAuthorizedPdf } from "@/lib/store/downloads";
+import { loadAuthorizedPdf } from "@/lib/store/downloads.server";
 
 export const Route = createFileRoute("/api/files/download/$token")({
   server: {
