@@ -3,8 +3,6 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { newId } from "./ids";
-import { ensureSeeded } from "./seed";
-import { appBaseUrl, fulfillPaidOrder } from "./fulfill";
 import { mapSettings } from "./map";
 import { DEFAULT_SETTINGS, ORDER_STATUS } from "./types";
 
@@ -51,6 +49,8 @@ async function loadPurchasable(slug: string) {
 export const startCheckout = createServerFn({ method: "POST" })
   .validator(checkoutSchema)
   .handler(async ({ data }) => {
+    const { ensureSeeded } = await import("./seed");
+    const { appBaseUrl, fulfillPaidOrder } = await import("./fulfill.server");
     await ensureSeeded();
     const product = await loadPurchasable(data.slug);
     const sql = await getSql();
@@ -148,6 +148,7 @@ export const startCheckout = createServerFn({ method: "POST" })
 export const verifyPaystack = createServerFn({ method: "POST" })
   .validator(z.object({ reference: z.string().min(3), origin: z.string().optional() }))
   .handler(async ({ data }) => {
+    const { fulfillPaidOrder } = await import("./fulfill.server");
     const secret = env("PAYSTACK_SECRET_KEY");
     if (!secret) throw new Error("Paystack is not configured.");
     const sql = await getSql();
@@ -249,6 +250,7 @@ export const submitBankTransfer = createServerFn({ method: "POST" })
 export const getBankDetails = createServerFn({ method: "GET" })
   .validator(z.object({ orderId: z.string() }))
   .handler(async ({ data }) => {
+    const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
     const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
