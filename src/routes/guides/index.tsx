@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Search, X } from "lucide-react";
 import { listCatalogue } from "@/lib/store/catalog";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type GuideSearch = {
   q?: string;
@@ -25,7 +27,10 @@ export const Route = createFileRoute("/guides/")({
   head: ({ loaderData }) => ({
     meta: [
       { title: `Guides — ${loaderData?.settings.storeName ?? "Fieldnote"}` },
-      { name: "description", content: "Browse practical digital PDF guides." },
+      {
+        name: "description",
+        content: "Browse practical digital PDF guides for parenting, money, work, and everyday life.",
+      },
     ],
   }),
 });
@@ -35,74 +40,141 @@ function Catalogue() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
+  const updateSearch = (patch: Partial<GuideSearch>) => {
+    void navigate({
+      search: {
+        q: patch.q !== undefined ? patch.q || undefined : search.q,
+        category: patch.category !== undefined ? patch.category || undefined : search.category,
+        sort: patch.sort ?? search.sort ?? "newest",
+      },
+    });
+  };
+
+  const hasFilters = Boolean(search.q || search.category);
+
   return (
     <PageShell settings={data.settings}>
-      <section className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 pt-10 pb-20 sm:px-6 sm:pt-12">
         <p className="text-xs tracking-[0.22em] text-accent uppercase">Catalogue</p>
-        <h1 className="mt-2 font-display text-4xl">All guides</h1>
-        <p className="mt-3 max-w-xl text-muted">Search by title, filter by category, and open a guide to see what’s inside.</p>
+        <h1 className="mt-2 font-display text-4xl tracking-tight">All guides</h1>
+        <p className="mt-3 max-w-xl text-muted">
+          Search by title, filter by category, and open a guide to see what’s inside before you buy.
+        </p>
 
-        <form
-          className="mt-8 grid gap-3 md:grid-cols-[1fr_200px_180px]"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const fd = new FormData(e.currentTarget);
-            void navigate({
-              search: {
-                q: String(fd.get("q") || "") || undefined,
-                category: String(fd.get("category") || "") || undefined,
-                sort: (String(fd.get("sort") || "newest") as GuideSearch["sort"]) || "newest",
-              },
-            });
-          }}
-        >
-          <Input name="q" defaultValue={search.q ?? ""} placeholder="Search guides" aria-label="Search guides" />
-          <select
-            name="category"
-            defaultValue={search.category ?? ""}
-            className="h-12 rounded-[12px] border border-line bg-surface px-3 text-sm"
-            aria-label="Filter by category"
-          >
-            <option value="">All categories</option>
-            {data.categories.map((c) => (
-              <option key={c.id} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-subtle"
+              aria-hidden
+            />
+            <Input
+              name="q"
+              value={search.q ?? ""}
+              onChange={(e) => updateSearch({ q: e.target.value })}
+              placeholder="Search guides…"
+              aria-label="Search guides"
+              className="pl-10"
+            />
+            {search.q ? (
+              <button
+                type="button"
+                className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1 text-subtle hover:bg-paper-2 hover:text-ink"
+                aria-label="Clear search"
+                onClick={() => updateSearch({ q: "" })}
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
+          </div>
           <select
             name="sort"
-            defaultValue={search.sort ?? "newest"}
-            className="h-12 rounded-[12px] border border-line bg-surface px-3 text-sm"
+            value={search.sort ?? "newest"}
+            onChange={(e) => updateSearch({ sort: e.target.value as GuideSearch["sort"] })}
+            className="h-12 rounded-[12px] border border-line bg-surface px-3 text-sm sm:w-48"
             aria-label="Sort guides"
           >
             <option value="newest">Featured / newest</option>
-            <option value="title">Title</option>
+            <option value="title">Title A–Z</option>
             <option value="price-asc">Price, low to high</option>
             <option value="price-desc">Price, high to low</option>
           </select>
-          <button type="submit" className="sr-only">
-            Apply
-          </button>
-        </form>
+        </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => updateSearch({ category: "" })}
+            className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+              !search.category
+                ? "bg-accent text-accent-fg"
+                : "bg-paper-2 text-ink hover:bg-paper-2/80"
+            }`}
+          >
+            All
+          </button>
           {data.categories.map((c) => (
-            <Link
+            <button
               key={c.id}
-              to="/guides"
-              search={{ ...search, category: c.slug }}
-              className={`rounded-full px-3 py-1.5 text-sm ${
-                search.category === c.slug ? "bg-accent text-accent-fg" : "bg-paper-2 text-ink"
+              type="button"
+              onClick={() => updateSearch({ category: c.slug })}
+              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                search.category === c.slug
+                  ? "bg-accent text-accent-fg"
+                  : "bg-paper-2 text-ink hover:bg-paper-2/80"
               }`}
             >
               {c.name}
-            </Link>
+            </button>
           ))}
         </div>
 
+        {hasFilters ? (
+          <p className="mt-4 text-sm text-muted">
+            {data.products.length} {data.products.length === 1 ? "guide" : "guides"}
+            {search.q ? (
+              <>
+                {" "}
+                for <span className="font-medium text-ink">“{search.q}”</span>
+              </>
+            ) : null}
+            {search.category ? (
+              <>
+                {" "}
+                in{" "}
+                <span className="font-medium text-ink">
+                  {data.categories.find((c) => c.slug === search.category)?.name ?? search.category}
+                </span>
+              </>
+            ) : null}
+            {" · "}
+            <button
+              type="button"
+              className="font-medium text-accent hover:underline"
+              onClick={() => updateSearch({ q: "", category: "" })}
+            >
+              Clear filters
+            </button>
+          </p>
+        ) : null}
+
         {data.products.length === 0 ? (
-          <p className="mt-16 text-muted">No guides match that search yet.</p>
+          <div className="mt-16 flex flex-col items-center rounded-[24px] border border-dashed border-line bg-surface px-6 py-16 text-center">
+            <p className="font-display text-2xl tracking-tight">No guides match</p>
+            <p className="mt-2 max-w-sm text-sm text-muted">
+              Try a different search term, or browse all categories to find something useful.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-6"
+              onClick={() => updateSearch({ q: "", category: "" })}
+            >
+              Clear filters
+            </Button>
+            <Link to="/" className="mt-3 text-sm text-accent hover:underline">
+              Back to home
+            </Link>
+          </div>
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {data.products.map((product) => (
