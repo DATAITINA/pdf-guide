@@ -60,7 +60,7 @@ function Home() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs tracking-[0.22em] text-accent uppercase">Featured</p>
-            <h2 className="mt-2 font-display text-3xl">Guides worth opening tonight</h2>
+            <h2 className="mt-2 font-display text-3xl">Guides worth reading</h2>
           </div>
           <Link to="/guides" className="hidden text-sm text-accent hover:underline sm:inline">
             View all
