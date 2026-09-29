@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { loadProductCover } from "@/lib/store/downloads";
+import { loadProductCover } from "@/lib/store/downloads.server";
 
 export const Route = createFileRoute("/api/covers/$productId")({
   server: {
