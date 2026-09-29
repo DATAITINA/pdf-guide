@@ -130,7 +130,7 @@ export async function ensureSeeded(): Promise<void> {
       "A Practical Guide for Nigerian Parents to Build Respect, Responsibility, Good Habits and Self-Control",
       "A warm, realistic 41-page guide for everyday family life — from homework and chores to screens, siblings and big feelings.",
       "This is a practical parenting guide for Nigerian parents and caregivers who are tired of repeating the same instruction, raising their voice, and wishing the moment had gone differently. It does not promise a silent house or a child who never makes mistakes. It shows how to make expectations clear, follow through without fear, and give children repeated chances to practise responsibility.\n\nThe approach is warm and firm at the same time. Discipline is treated as teaching a skill — not proving who is in charge, and not frightening a child into obedience. The guide walks through a five-step Calm Parent system, then applies it to tantrums, different ages, chores, homework, screens, talking back and sibling fights. Printable tools and 50 alternative phrases help you put the ideas to work at home.\n\nIt is written for real homes: school runs, work, meals, bills, care for relatives, and more than one caregiver. Keep the principles; adapt the routines, language and family values.",
-      450000,
+      200000,
       "NGN",
       "cat_parenting",
       "/covers/disciplined-child.jpg",
