@@ -3,7 +3,6 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { mapCard, mapCategory, mapDetail, mapFaq, mapSettings, mapTestimonial } from "./map";
-import { ensureSeeded } from "./seed";
 import { DEFAULT_SETTINGS } from "./types";
 
 const PRODUCT_SELECT = `
@@ -17,6 +16,7 @@ const PRODUCT_SELECT = `
 `;
 
 export const getStorefront = createServerFn({ method: "GET" }).handler(async () => {
+  const { ensureSeeded } = await import("./seed");
   await ensureSeeded();
   const sql = await getSql();
   const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
@@ -82,6 +82,7 @@ export const listCatalogue = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data }) => {
+    const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
     const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
@@ -132,6 +133,7 @@ export const listCatalogue = createServerFn({ method: "GET" })
 export const getProductBySlug = createServerFn({ method: "GET" })
   .validator(z.object({ slug: z.string() }))
   .handler(async ({ data }) => {
+    const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
     const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
@@ -185,6 +187,7 @@ function emptyPayments() {
 }
 
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {
+  const { ensureSeeded } = await import("./seed");
   await ensureSeeded();
   const sql = await getSql();
   const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
