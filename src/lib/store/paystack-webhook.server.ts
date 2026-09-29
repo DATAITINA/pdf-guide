@@ -1,7 +1,7 @@
 import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { hmacSha512, newId, safeEqual } from "./ids";
-import { fulfillPaidOrder } from "./fulfill";
+import { fulfillPaidOrder } from "./fulfill.server";
 
 /**
  * Server-only Paystack webhook handler.
