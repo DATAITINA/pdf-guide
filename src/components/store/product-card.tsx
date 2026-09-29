@@ -8,13 +8,13 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       <Link
         to="/guides/$slug"
         params={{ slug: product.slug }}
-        className="flex h-full flex-col rounded-[28px] p-2 transition-transform duration-200 hover:-translate-y-0.5"
+        className="flex h-full flex-col rounded-[24px] p-1.5 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-offset-4"
       >
-        <div className="relative overflow-hidden rounded-[20px] bg-paper-2 shadow-card">
+        <div className="relative overflow-hidden rounded-[18px] bg-paper-2 shadow-card">
           <img
             src={product.coverImage}
             alt={`Cover of ${product.title}`}
-            className="aspect-2/3 w-full object-cover"
+            className="aspect-2/3 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
             loading="lazy"
           />
           {product.isPlaceholder ? (
@@ -29,14 +29,16 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           ) : null}
         </div>
         <div className="flex flex-1 flex-col px-2 pt-4 pb-2">
-          <p className="text-[12px] tracking-[0.14em] text-accent uppercase">{product.categoryName}</p>
-          <h3 className="mt-1 font-display text-[1.02rem] leading-snug text-ink">{product.title}</h3>
+          <p className="text-[11px] tracking-[0.14em] text-accent uppercase">{product.categoryName}</p>
+          <h3 className="mt-1.5 font-display text-[1.05rem] leading-snug tracking-tight text-ink">
+            {product.title}
+          </h3>
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{product.shortDescription}</p>
-          <div className="mt-auto flex items-center justify-between pt-4">
+          <div className="mt-auto flex items-center justify-between gap-3 pt-4">
             <span className="tabular-nums text-sm font-medium">
               {product.isPlaceholder ? "Placeholder" : formatMoney(product.priceKobo, product.currency)}
             </span>
-            <span className="text-sm text-accent group-hover:underline">View guide</span>
+            <span className="text-sm text-accent transition-colors group-hover:underline">View guide</span>
           </div>
         </div>
       </Link>
