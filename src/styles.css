@@ -34,6 +34,7 @@
     -moz-osx-font-smoothing: grayscale;
     background: var(--color-paper);
     color: var(--color-ink);
+    scroll-behavior: smooth;
   }
   body {
     font-family: var(--font-sans);
@@ -59,6 +60,12 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -68,5 +75,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
