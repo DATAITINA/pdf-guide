@@ -5,9 +5,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 import { getSessionUser } from "@/lib/auth/verify.server";
 import { newId } from "./ids";
 import { slugify } from "./slug";
-import { ensureSeeded } from "./seed";
-import { fulfillPaidOrder } from "./fulfill";
-import { mapCard, mapDetail, mapFaq, mapOrder, mapSettings, mapTestimonial } from "./map";
+import { mapDetail, mapFaq, mapOrder, mapSettings, mapTestimonial } from "./map";
 import { DEFAULT_SETTINGS, ORDER_STATUS } from "./types";
 import { nairaToKobo } from "./money";
 
@@ -20,6 +18,7 @@ class ForbiddenError extends Error {
 }
 
 async function requireStoreAdmin(userId: string, bearerToken?: string) {
+  const { ensureSeeded } = await import("./seed");
   await ensureSeeded();
   const sql = await getSql();
   const admins = await sql<{ user_id: string }>`select user_id from store_admins`;
@@ -280,6 +279,7 @@ export const reviewTransfer = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     await requireStoreAdmin(context.userId);
+    const { fulfillPaidOrder } = await import("./fulfill.server");
     const sql = await getSql();
     const orders = await sql.query<{ id: string; status: string }>(
       `select id, status from orders where id = $1`,
