@@ -6,14 +6,12 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
   return (
     <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-[9px] bg-accent text-accent-fg" aria-hidden>
-            <svg viewBox="0 0 24 24" className="size-4 fill-none stroke-current" strokeWidth="1.8">
-              <path d="M7 4h8.5a3.5 3.5 0 0 1 0 7H7z" />
-              <path d="M7 11h9.2a3.3 3.3 0 0 1 0 6.6H7V4" />
-            </svg>
+        <Link to="/" aria-label={`${settings.storeName} home`} className="flex min-w-0 items-center gap-2.5">
+          <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
+          <span className="flex min-w-0 flex-col leading-none">
+            <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">{settings.storeName}</span>
+            <span className="mt-1 text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">Notes for real life</span>
           </span>
-          <span className="font-display text-xl tracking-tight">{settings.storeName}</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <Link to="/guides" className="hidden rounded-[10px] px-3 py-2 hover:bg-paper-2 sm:inline">
@@ -37,7 +35,10 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
     <footer className="mt-20 border-t border-line bg-paper-2/60">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-display text-2xl">{settings.storeName}</p>
+          <div className="flex items-center gap-3">
+            <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
+            <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
+          </div>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted">{settings.tagline}</p>
         </div>
         <div>
