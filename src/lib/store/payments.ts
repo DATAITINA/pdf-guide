@@ -13,6 +13,7 @@ const checkoutSchema = z.object({
   phone: z.string().trim().max(40).optional(),
   method: z.enum(["paystack", "bank_transfer", "demo"]),
   origin: z.string().optional(),
+  voucherCode: z.string().trim().max(24).optional(),
 });
 
 async function loadPurchasable(slug: string) {
@@ -46,6 +47,26 @@ async function loadPurchasable(slug: string) {
   return product;
 }
 
+async function resolveVoucher(
+  codeRaw: string | undefined,
+  productId: string,
+  priceKobo: number,
+): Promise<{ voucherId: string | null; discountKobo: number; amountKobo: number }> {
+  if (!codeRaw?.trim()) {
+    return { voucherId: null, discountKobo: 0, amountKobo: priceKobo };
+  }
+  const { validateVoucher } = await import("./waitlist");
+  const result = await validateVoucher({ data: { code: codeRaw, productId } });
+  if (!result.ok) {
+    throw new Error(result.message);
+  }
+  return {
+    voucherId: result.voucherId,
+    discountKobo: result.discountKobo,
+    amountKobo: result.finalKobo,
+  };
+}
+
 export const startCheckout = createServerFn({ method: "POST" })
   .validator(checkoutSchema)
   .handler(async ({ data }) => {
@@ -53,6 +74,7 @@ export const startCheckout = createServerFn({ method: "POST" })
     const { appBaseUrl, fulfillPaidOrder } = await import("./fulfill.server");
     await ensureSeeded();
     const product = await loadPurchasable(data.slug);
+    const pricing = await resolveVoucher(data.voucherCode, product.id, Number(product.price_kobo));
     const sql = await getSql();
     const orderId = newId("ord");
     const reference = `FN-${Date.now().toString(36)}-${newId().slice(0, 8)}`.toUpperCase();
@@ -69,19 +91,22 @@ export const startCheckout = createServerFn({ method: "POST" })
     await sql.query(
       `insert into orders (
         id, customer_name, customer_email, customer_phone, product_id,
-        amount_kobo, currency, payment_method, payment_reference, status
-      ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        amount_kobo, currency, payment_method, payment_reference, status,
+        voucher_id, discount_kobo
+      ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
       [
         orderId,
         data.name,
         data.email.toLowerCase(),
         data.phone || null,
         product.id,
-        Number(product.price_kobo),
+        pricing.amountKobo,
         product.currency,
         method,
         reference,
         ORDER_STATUS.pending,
+        pricing.voucherId,
+        pricing.discountKobo,
       ],
     );
 
@@ -100,7 +125,7 @@ export const startCheckout = createServerFn({ method: "POST" })
         kind: "bank" as const,
         orderId,
         reference,
-        amountKobo: Number(product.price_kobo),
+        amountKobo: pricing.amountKobo,
         currency: product.currency,
       };
     }
@@ -116,7 +141,7 @@ export const startCheckout = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         email: data.email.toLowerCase(),
-        amount: Number(product.price_kobo),
+        amount: pricing.amountKobo,
         currency: product.currency,
         reference,
         callback_url: callbackBase ? `${callbackBase}/checkout/verify` : undefined,
@@ -124,6 +149,7 @@ export const startCheckout = createServerFn({ method: "POST" })
           order_id: orderId,
           product_id: product.id,
           product_slug: product.slug,
+          voucher_id: pricing.voucherId,
         },
       }),
     });
