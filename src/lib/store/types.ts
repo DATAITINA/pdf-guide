@@ -113,7 +113,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   whatsapp: "",
   currency: "NGN",
   bankName: "Moniepoint",
-  accountName: "Fieldnote",
+  accountName: "David Bassey Itina",
   accountNumber: "9157601666",
   instagram: "",
   twitter: "",
