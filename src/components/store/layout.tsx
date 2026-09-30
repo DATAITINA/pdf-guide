@@ -83,8 +83,13 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
       </div>
 
       {open ? (
-        <div id="mobile-nav" className="border-t border-line bg-paper md:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4" aria-label="Mobile">
+        <div
+          id="mobile-nav"
+          className="border-t border-line bg-paper md:hidden"
+          role="dialog"
+          aria-label="Mobile navigation"
+        >
+          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -129,8 +134,7 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
           </div>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{settings.tagline}</p>
           <p className="mt-4 text-sm text-muted">
-            Practical digital guides you can download and keep — written for ordinary days, not
-            perfect ones.
+            Practical digital guides you can download and keep — written for ordinary days, not perfect ones.
           </p>
         </div>
         <div>

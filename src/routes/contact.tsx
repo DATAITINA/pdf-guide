@@ -19,27 +19,8 @@ function Contact() {
         <p className="text-xs tracking-[0.18em] text-accent uppercase">Contact</p>
         <h1 className="mt-2 font-display text-4xl">How to reach us</h1>
         <div className="mt-8 space-y-3 text-[17px] leading-relaxed">
-          <p>
-            Email ·{" "}
-            {settings.supportEmail ? (
-              <a className="underline underline-offset-4" href={`mailto:${settings.supportEmail}`}>
-                {settings.supportEmail}
-              </a>
-            ) : (
-              "Support email is currently unavailable."
-            )}
-          </p>
-          {settings.contactPhone ? (
-            <p>
-              Phone ·{" "}
-              <a
-                className="underline underline-offset-4"
-                href={`tel:${settings.contactPhone.replace(/[^\d+]/g, "")}`}
-              >
-                {settings.contactPhone}
-              </a>
-            </p>
-          ) : null}
+          <p>Email · {settings.supportEmail || "Add a support email in Settings"}</p>
+          {settings.contactPhone ? <p>Phone · {settings.contactPhone}</p> : null}
           {wa ? (
             <p>
               WhatsApp ·{" "}
@@ -47,7 +28,9 @@ function Contact() {
                 Message {settings.storeName}
               </a>
             </p>
-          ) : null}
+          ) : (
+            <p className="text-muted">WhatsApp number can be added in publisher settings.</p>
+          )}
         </div>
       </section>
     </PageShell>
