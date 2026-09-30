@@ -21,7 +21,7 @@ async function loadSeedPdf(): Promise<Buffer | null> {
   return null;
 }
 
-/** Ensure bank transfer details are present on the live store settings row. */
+/** Keep bank transfer details in sync with the publisher account. */
 async function ensureBankDetails(): Promise<void> {
   const sql = await getSql();
   const rows = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
@@ -32,12 +32,11 @@ async function ensureBankDetails(): Promise<void> {
     return;
   }
   const current = mapSettings(rows[0].value);
-  if (current.accountNumber && current.bankName) return;
   const next = {
     ...current,
-    bankName: current.bankName || DEFAULT_SETTINGS.bankName,
+    bankName: DEFAULT_SETTINGS.bankName,
     accountName: current.accountName || DEFAULT_SETTINGS.accountName,
-    accountNumber: current.accountNumber || DEFAULT_SETTINGS.accountNumber,
+    accountNumber: DEFAULT_SETTINGS.accountNumber,
   };
   await sql.query(
     `update settings set value = $1::jsonb, updated_at = now() where key = 'store'`,
