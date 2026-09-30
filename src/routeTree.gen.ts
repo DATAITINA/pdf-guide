@@ -25,7 +25,6 @@ import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminTransfersRouteImport } from './routes/admin/transfers'
-import { Route as AdminWaitlistRouteImport } from './routes/admin/waitlist'
 import { Route as CheckoutSlugRouteImport } from './routes/checkout/$slug'
 import { Route as CheckoutVerifyRouteImport } from './routes/checkout/verify'
 import { Route as DownloadTokenRouteImport } from './routes/download/$token'
@@ -119,11 +118,6 @@ const AdminTransfersRoute = AdminTransfersRouteImport.update({
   path: '/transfers',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
-  id: '/waitlist',
-  path: '/waitlist',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const CheckoutSlugRoute = CheckoutSlugRouteImport.update({
   id: '/checkout/$slug',
   path: '/checkout/$slug',
@@ -201,7 +195,6 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transfers': typeof AdminTransfersRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
@@ -231,7 +224,6 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transfers': typeof AdminTransfersRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
@@ -263,7 +255,6 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transfers': typeof AdminTransfersRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/checkout/$slug': typeof CheckoutSlugRoute
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
@@ -296,7 +287,6 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/transfers'
-    | '/admin/waitlist'
     | '/checkout/$slug'
     | '/checkout/verify'
     | '/download/$token'
@@ -326,7 +316,6 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/transfers'
-    | '/admin/waitlist'
     | '/checkout/$slug'
     | '/checkout/verify'
     | '/download/$token'
@@ -357,7 +346,6 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/settings'
     | '/admin/transfers'
-    | '/admin/waitlist'
     | '/checkout/$slug'
     | '/checkout/verify'
     | '/download/$token'
@@ -512,13 +500,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTransfersRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/waitlist': {
-      id: '/admin/waitlist'
-      path: '/waitlist'
-      fullPath: '/admin/waitlist'
-      preLoaderRoute: typeof AdminWaitlistRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/checkout/$slug': {
       id: '/checkout/$slug'
       path: '/checkout/$slug'
@@ -611,7 +592,6 @@ interface AdminRouteRouteChildren {
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransfersRoute: typeof AdminTransfersRoute
-  AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminProductIdRoute: typeof AdminProductIdRoute
 }
@@ -621,7 +601,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminProductsRoute: AdminProductsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTransfersRoute: AdminTransfersRoute,
-  AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminProductIdRoute: AdminProductIdRoute,
 }

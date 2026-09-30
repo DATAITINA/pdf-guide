@@ -12,15 +12,3 @@ export function env(key: string): string | undefined {
 export function isWorkspacePreview(): boolean {
   return !env("GROK_PROJECT_ID");
 }
-
-/** Test-only purchases must never be enabled on a deployed storefront. */
-export function isDemoCheckoutEnabled(
-  runtime: Readonly<Record<string, string | undefined>> = process.env,
-): boolean {
-  return (
-    runtime.NODE_ENV !== "production" &&
-    !runtime.VERCEL &&
-    !runtime.VERCEL_ENV &&
-    !runtime.GROK_PROJECT_ID
-  );
-}

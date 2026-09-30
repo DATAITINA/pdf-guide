@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, Loader2, Sprout } from "lucide-react";
+import { Check, Copy, Loader2 } from "lucide-react";
 import { getWaitlistBoard, joinWaitlist, type TopicBoardItem } from "@/lib/store/waitlist";
 import { TOPIC_REQUEST_THRESHOLD } from "@/lib/store/waitlist-config";
 import { Button } from "@/components/ui/button";
@@ -138,8 +138,7 @@ export function WaitlistSection() {
       <p className="text-xs tracking-[0.22em] text-accent uppercase">Next guides</p>
       <h2 className="mt-2 font-display text-3xl tracking-tight">Tell me what to write next.</h2>
       <p className="mt-3 text-muted">
-        Pick a topic you need. Join the list and get a ₦1,500 voucher for that guide when it
-        launches.
+        Pick a topic you need. Join the list and get a ₦1,500 voucher for that guide when it launches.
       </p>
       <p className="mt-2 text-sm text-muted">
         This voucher is for future guides, not the one already available.
@@ -156,20 +155,18 @@ export function WaitlistSection() {
             <div className="ticket-card rounded-[18px] border border-dashed border-accent/40 bg-surface px-6 py-7 shadow-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">
-                    Your voucher
-                  </p>
+                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">Your voucher</p>
                   <p className="mt-1 font-display text-xl tracking-tight">{ticket.topicName}</p>
                   <p className="mt-1 text-sm text-muted">
                     You're #{ticket.position} for this topic
                     {ticket.duplicate ? " · already on the list" : ""}
                   </p>
                 </div>
-                <Sprout className="size-6 text-accent" aria-hidden="true" />
+                <span className="text-2xl" aria-hidden>
+                  🌱
+                </span>
               </div>
-              <p className="mt-6 font-mono text-2xl tracking-[0.12em] text-ink tabular-nums">
-                {revealed || "· · ·"}
-              </p>
+              <p className="mt-6 font-mono text-2xl tracking-[0.12em] text-ink tabular-nums">{revealed || "· · ·"}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button type="button" size="sm" onClick={() => void copyCode()}>
                   {copied ? (
@@ -195,9 +192,8 @@ export function WaitlistSection() {
                   <button
                     key={name}
                     type="button"
-                    aria-pressed={selected === name && !otherOpen}
                     onClick={() => pickTopic(name)}
-                    className={`min-h-11 rounded-full px-4 text-sm transition-colors ${
+                    className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
                       selected === name && !otherOpen
                         ? "bg-accent text-accent-fg"
                         : "bg-paper-2 text-ink hover:bg-paper-2/80"
@@ -208,12 +204,9 @@ export function WaitlistSection() {
                 ))}
                 <button
                   type="button"
-                  aria-pressed={otherOpen}
                   onClick={pickOther}
-                  className={`min-h-11 rounded-full px-4 text-sm transition-colors ${
-                    otherOpen
-                      ? "bg-accent text-accent-fg"
-                      : "bg-paper-2 text-ink hover:bg-paper-2/80"
+                  className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                    otherOpen ? "bg-accent text-accent-fg" : "bg-paper-2 text-ink hover:bg-paper-2/80"
                   }`}
                 >
                   Other
@@ -280,8 +273,7 @@ export function WaitlistSection() {
                 required
               />
               <span>
-                I agree to be contacted about this guide. Data handled per the Nigeria Data
-                Protection Act.
+                I agree to be contacted about this guide. Data handled per the Nigeria Data Protection Act.
               </span>
             </label>
 
