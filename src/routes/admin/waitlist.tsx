@@ -7,7 +7,7 @@ import {
   listAdminWaitlist,
   mergeTopics,
   setTopicBuilding,
-} from "@/lib/store/waitlist";
+} from "@/lib/store/waitlist-admin";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/waitlist")({
@@ -36,7 +36,7 @@ function AdminWaitlist() {
   async function refresh() {
     setLoading(true);
     try {
-      const data = await listAdminWaitlist({ data: {} });
+      const data = await listAdminWaitlist();
       setTopics(data.topics);
       setProducts(data.products);
     } catch (err) {
@@ -86,7 +86,9 @@ function AdminWaitlist() {
       if (result.dryRun) {
         toast.message(`Dry run: would email ${result.wouldEmail} people for ${result.topicName}`);
       } else {
-        toast.success(`Launched “${result.topicName}”. Activated ${result.activated}, emailed ${result.emailed}.`);
+        toast.success(
+          `Launched “${result.topicName}”. Activated ${result.activated}, emailed ${result.emailed}.`,
+        );
         void refresh();
       }
     } catch (err) {
