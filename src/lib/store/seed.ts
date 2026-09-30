@@ -35,7 +35,7 @@ async function ensureBankDetails(): Promise<void> {
   const next = {
     ...current,
     bankName: DEFAULT_SETTINGS.bankName,
-    accountName: current.accountName || DEFAULT_SETTINGS.accountName,
+    accountName: DEFAULT_SETTINGS.accountName,
     accountNumber: DEFAULT_SETTINGS.accountNumber,
   };
   await sql.query(
