@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getSql } from "@/lib/db";
+import { mapSettings } from "./map";
 import { DEFAULT_SETTINGS } from "./types";
 
 const PARENTING_ID = "prod_disciplined_child";
@@ -20,6 +21,30 @@ async function loadSeedPdf(): Promise<Buffer | null> {
   return null;
 }
 
+/** Ensure bank transfer details are present on the live store settings row. */
+async function ensureBankDetails(): Promise<void> {
+  const sql = await getSql();
+  const rows = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
+  if (!rows[0]) {
+    await sql.query(`insert into settings (key, value) values ('store', $1::jsonb)`, [
+      JSON.stringify(DEFAULT_SETTINGS),
+    ]);
+    return;
+  }
+  const current = mapSettings(rows[0].value);
+  if (current.accountNumber && current.bankName) return;
+  const next = {
+    ...current,
+    bankName: current.bankName || DEFAULT_SETTINGS.bankName,
+    accountName: current.accountName || DEFAULT_SETTINGS.accountName,
+    accountNumber: current.accountNumber || DEFAULT_SETTINGS.accountNumber,
+  };
+  await sql.query(
+    `update settings set value = $1::jsonb, updated_at = now() where key = 'store'`,
+    [JSON.stringify(next)],
+  );
+}
+
 export async function ensureSeeded(): Promise<void> {
   const sql = await getSql();
   const existing = await sql<{ n: number }>`select count(*)::int as n from categories`;
@@ -36,6 +61,7 @@ export async function ensureSeeded(): Promise<void> {
         );
       }
     }
+    await ensureBankDetails();
     return;
   }
 
