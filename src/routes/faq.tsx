@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getStorefront } from "@/lib/store/catalog";
+import { contextualPaymentFaqAnswer } from "@/lib/store/payment-copy";
 import { PageShell } from "@/components/store/layout";
 
 export const Route = createFileRoute("/faq")({
@@ -18,12 +19,15 @@ function FaqPage() {
         <p className="text-xs tracking-[0.18em] text-accent uppercase">FAQ</p>
         <h1 className="mt-2 font-display text-4xl">Common questions</h1>
         <div className="mt-8 divide-y divide-line border-y border-line">
-          {data.faqs.map((faq) => (
-            <div key={faq.id} className="py-5">
-              <h2 className="font-medium">{faq.question}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{faq.answer}</p>
-            </div>
-          ))}
+          {data.faqs.map((faq) => {
+            const answer = contextualPaymentFaqAnswer(faq.question, faq.answer, data.payments);
+            return (
+              <div key={faq.id} className="py-5">
+                <h2 className="font-medium">{faq.question}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{answer}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
     </PageShell>

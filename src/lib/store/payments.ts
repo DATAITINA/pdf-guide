@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getSql } from "@/lib/db";
-import { env } from "@/lib/env.server";
+import { env, isDemoCheckoutEnabled } from "@/lib/env.server";
 import { newId } from "./ids";
 import { mapSettings } from "./map";
 import { DEFAULT_SETTINGS, ORDER_STATUS } from "./types";
@@ -81,8 +81,13 @@ export const startCheckout = createServerFn({ method: "POST" })
     const method = data.method;
     const paystackReady = Boolean(env("PAYSTACK_SECRET_KEY"));
 
+    if (method === "demo" && !isDemoCheckoutEnabled()) {
+      throw new Error("Test checkout is only available in local development.");
+    }
     if (method === "paystack" && !paystackReady) {
-      throw new Error("Card payments are not configured yet. Use bank transfer or the test checkout.");
+      throw new Error(
+        "Card payments are not configured yet. Please use bank transfer or contact support.",
+      );
     }
     if (method === "demo" && paystackReady) {
       throw new Error("Test checkout is disabled when Paystack is configured.");
@@ -256,7 +261,8 @@ export const submitBankTransfer = createServerFn({ method: "POST" })
     const raw = Buffer.from(data.proofBase64, "base64");
     if (raw.length > 6 * 1024 * 1024) throw new Error("Proof file is too large (max 6MB).");
     const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-    if (!allowed.includes(data.proofMime)) throw new Error("Upload a JPG, PNG, WebP or PDF receipt.");
+    if (!allowed.includes(data.proofMime))
+      throw new Error("Upload a JPG, PNG, WebP or PDF receipt.");
 
     await sql.query(
       `insert into transfer_proofs (order_id, filename, mime, data, byte_size)
@@ -279,7 +285,9 @@ export const getBankDetails = createServerFn({ method: "GET" })
     const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
-    const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
+    const settingsRow = await sql<{
+      value: unknown;
+    }>`select value from settings where key = 'store'`;
     const settings = settingsRow[0] ? mapSettings(settingsRow[0].value) : DEFAULT_SETTINGS;
     const orders = await sql.query<{
       id: string;

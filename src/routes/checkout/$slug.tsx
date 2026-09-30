@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getProductBySlug } from "@/lib/store/catalog";
 import { startCheckout } from "@/lib/store/payments";
@@ -30,7 +31,14 @@ function CheckoutPage() {
   const data = Route.useLoaderData();
   const search = Route.useSearch();
   const product = data.product!;
-  const [pending, setPending] = useState(false);
+  const [pendingMethod, setPendingMethod] = useState<"paystack" | "bank_transfer" | "demo" | null>(
+    null,
+  );
+  const pending = pendingMethod !== null;
+  const checkoutAvailable =
+    data.payments.paystackConfigured ||
+    data.payments.bankConfigured ||
+    data.payments.demoCheckoutEnabled;
   const [voucherCode, setVoucherCode] = useState(search.code ?? "");
   const [voucherMsg, setVoucherMsg] = useState<string | null>(null);
   const [discountKobo, setDiscountKobo] = useState(0);
@@ -79,16 +87,13 @@ function CheckoutPage() {
   }
 
   async function onSubmit(method: "paystack" | "bank_transfer" | "demo") {
-    const form = document.getElementById("checkout-form") as HTMLFormElement;
+    const form = document.getElementById("checkout-form");
+    if (!(form instanceof HTMLFormElement) || !form.reportValidity()) return;
     const fd = new FormData(form);
     const name = String(fd.get("name") || "").trim();
     const email = String(fd.get("email") || "").trim();
     const phone = String(fd.get("phone") || "").trim();
-    if (name.length < 2 || !email.includes("@")) {
-      toast.error("Please enter your name and a valid email.");
-      return;
-    }
-    setPending(true);
+    setPendingMethod(method);
     try {
       const result = await startCheckout({
         data: {
@@ -112,7 +117,7 @@ function CheckoutPage() {
       window.location.href = `/checkout/transfer/${result.orderId}`;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not start checkout.");
-      setPending(false);
+      setPendingMethod(null);
     }
   }
 
@@ -130,13 +135,32 @@ function CheckoutPage() {
             <p className="mt-8 rounded-[18px] bg-paper-2 px-4 py-4 text-sm">
               This is a demo listing and cannot be purchased.
             </p>
+          ) : !checkoutAvailable ? (
+            <div
+              className="mt-8 rounded-[18px] border border-line bg-surface px-5 py-5"
+              role="status"
+            >
+              <h2 className="font-display text-2xl tracking-tight">
+                Checkout is temporarily unavailable
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                No payment method is ready yet, so this page will not collect your details or create
+                an order. Please contact Fieldnote for help.
+              </p>
+              <Link
+                to="/contact"
+                className="mt-4 inline-flex min-h-11 items-center font-medium text-accent hover:underline"
+              >
+                Contact support
+              </Link>
+            </div>
           ) : (
             <form id="checkout-form" className="mt-8 space-y-4">
               <Field label="Full name">
-                <Input name="name" autoComplete="name" required />
+                <Input name="name" autoComplete="name" minLength={2} maxLength={120} required />
               </Field>
               <Field label="Email" hint="Your download link is tied to this email.">
-                <Input name="email" type="email" autoComplete="email" required />
+                <Input name="email" type="email" autoComplete="email" maxLength={200} required />
               </Field>
               <Field label="Phone (optional)">
                 <Input name="phone" type="tel" autoComplete="tel" />
@@ -173,44 +197,71 @@ function CheckoutPage() {
                 ) : null}
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-3 pt-2" aria-busy={pending}>
                 {data.payments.paystackConfigured ? (
                   <Button
                     type="button"
                     className="w-full"
                     disabled={pending}
+                    aria-busy={pendingMethod === "paystack"}
                     onClick={() => onSubmit("paystack")}
                   >
-                    Pay with Paystack · {formatMoney(finalKobo, product.currency)}
+                    {pendingMethod === "paystack" ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Starting
+                        secure payment…
+                      </>
+                    ) : (
+                      <>Pay with Paystack · {formatMoney(finalKobo, product.currency)}</>
+                    )}
                   </Button>
-                ) : (
+                ) : null}
+                {data.payments.bankConfigured ? (
                   <Button
                     type="button"
+                    variant="outline"
                     className="w-full"
                     disabled={pending}
+                    aria-busy={pendingMethod === "bank_transfer"}
+                    onClick={() => onSubmit("bank_transfer")}
+                  >
+                    {pendingMethod === "bank_transfer" ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Preparing
+                        transfer…
+                      </>
+                    ) : (
+                      <>Pay by bank transfer · {formatMoney(finalKobo, product.currency)}</>
+                    )}
+                  </Button>
+                ) : null}
+                {data.payments.demoCheckoutEnabled ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={pending}
+                    aria-busy={pendingMethod === "demo"}
                     onClick={() => onSubmit("demo")}
                   >
-                    Complete test purchase · {formatMoney(finalKobo, product.currency)}
+                    {pendingMethod === "demo" ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Completing
+                        test flow…
+                      </>
+                    ) : (
+                      <>Development test checkout · {formatMoney(finalKobo, product.currency)}</>
+                    )}
                   </Button>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  disabled={pending || !data.payments.bankConfigured}
-                  onClick={() => onSubmit("bank_transfer")}
-                >
-                  Pay by bank transfer
-                </Button>
-                {!data.payments.paystackConfigured ? (
-                  <p className="text-xs text-muted">
-                    Card payments are in test mode until Paystack keys are added. The test purchase unlocks
-                    the real PDF so you can try the download flow.
+                ) : null}
+                {!data.payments.paystackConfigured && data.payments.bankConfigured ? (
+                  <p className="text-xs text-muted" role="status">
+                    Online card payment is temporarily unavailable. Bank transfer remains available.
                   </p>
                 ) : null}
-                {!data.payments.bankConfigured ? (
-                  <p className="text-xs text-muted">
-                    Bank transfer becomes available after the publisher adds account details in Settings.
+                {data.payments.demoCheckoutEnabled ? (
+                  <p className="text-xs text-muted" role="status">
+                    Local development only — no payment is processed.
                   </p>
                 ) : null}
               </div>
@@ -235,7 +286,9 @@ function CheckoutPage() {
                 </p>
                 <p className="flex items-center justify-between text-muted">
                   <span>Voucher</span>
-                  <span className="tabular-nums">−{formatMoney(discountKobo, product.currency)}</span>
+                  <span className="tabular-nums">
+                    −{formatMoney(discountKobo, product.currency)}
+                  </span>
                 </p>
               </>
             ) : null}

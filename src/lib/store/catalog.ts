@@ -1,9 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getSql } from "@/lib/db";
-import { env } from "@/lib/env.server";
+import { env, isDemoCheckoutEnabled } from "@/lib/env.server";
 import { mapCard, mapCategory, mapDetail, mapFaq, mapSettings, mapTestimonial } from "./map";
 import { DEFAULT_SETTINGS } from "./types";
+
+type CategoryRow = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  sort_order: number;
+};
 
 const PRODUCT_SELECT = `
   p.id, p.title, p.slug, p.subtitle, p.short_description, p.full_description,
@@ -15,26 +23,31 @@ const PRODUCT_SELECT = `
   exists(select 1 from product_files f where f.product_id = p.id) as has_pdf
 `;
 
+const PUBLIC_CATEGORY_SELECT = `
+  select c.id, c.name, c.slug, c.description, c.sort_order
+  from categories c
+  where exists (
+    select 1 from products p
+    where p.category_id = c.id
+      and p.published = true
+      and p.archived = false
+      and p.is_placeholder = false
+  )
+  order by c.sort_order
+`;
+
 export const getStorefront = createServerFn({ method: "GET" }).handler(async () => {
   const { ensureSeeded } = await import("./seed");
   await ensureSeeded();
   const sql = await getSql();
   const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
   const settings = settingsRow[0] ? mapSettings(settingsRow[0].value) : DEFAULT_SETTINGS;
-  const categories = (
-    await sql<{
-      id: string;
-      name: string;
-      slug: string;
-      description: string;
-      sort_order: number;
-    }>`select id, name, slug, description, sort_order from categories order by sort_order`
-  ).map(mapCategory);
+  const categories = (await sql.query<CategoryRow>(PUBLIC_CATEGORY_SELECT)).map(mapCategory);
   const products = (
     await sql.query<Parameters<typeof mapCard>[0]>(
       `select ${PRODUCT_SELECT} from products p
        join categories c on c.id = p.category_id
-       where p.published = true and p.archived = false
+       where p.published = true and p.archived = false and p.is_placeholder = false
        order by p.featured desc, p.created_at desc`,
     )
   ).map(mapCard);
@@ -55,7 +68,7 @@ export const getStorefront = createServerFn({ method: "GET" }).handler(async () 
       is_placeholder: boolean;
       sort_order: number;
       published: boolean;
-    }>`select * from testimonials where published = true order by sort_order`
+    }>`select * from testimonials where published = true and is_placeholder = false order by sort_order`
   ).map(mapTestimonial);
 
   return {
@@ -69,6 +82,7 @@ export const getStorefront = createServerFn({ method: "GET" }).handler(async () 
       paystackConfigured: Boolean(env("PAYSTACK_SECRET_KEY")),
       emailConfigured: Boolean(env("RESEND_API_KEY") && env("RESEND_FROM_EMAIL")),
       bankConfigured: Boolean(settings.bankName && settings.accountName && settings.accountNumber),
+      demoCheckoutEnabled: isDemoCheckoutEnabled(),
     },
   };
 });
@@ -85,19 +99,13 @@ export const listCatalogue = createServerFn({ method: "GET" })
     const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
-    const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
+    const settingsRow = await sql<{
+      value: unknown;
+    }>`select value from settings where key = 'store'`;
     const settings = settingsRow[0] ? mapSettings(settingsRow[0].value) : DEFAULT_SETTINGS;
-    const categories = (
-      await sql<{
-        id: string;
-        name: string;
-        slug: string;
-        description: string;
-        sort_order: number;
-      }>`select id, name, slug, description, sort_order from categories order by sort_order`
-    ).map(mapCategory);
+    const categories = (await sql.query<CategoryRow>(PUBLIC_CATEGORY_SELECT)).map(mapCategory);
 
-    const where = ["p.published = true", "p.archived = false"];
+    const where = ["p.published = true", "p.archived = false", "p.is_placeholder = false"];
     const params: unknown[] = [];
     if (data.category) {
       params.push(data.category);
@@ -106,7 +114,9 @@ export const listCatalogue = createServerFn({ method: "GET" })
     if (data.q?.trim()) {
       params.push(`%${data.q.trim()}%`);
       const i = params.length;
-      where.push(`(p.title ilike $${i} or p.short_description ilike $${i} or p.subtitle ilike $${i})`);
+      where.push(
+        `(p.title ilike $${i} or p.short_description ilike $${i} or p.subtitle ilike $${i})`,
+      );
     }
     const order =
       data.sort === "price-asc"
@@ -136,23 +146,26 @@ export const getProductBySlug = createServerFn({ method: "GET" })
     const { ensureSeeded } = await import("./seed");
     await ensureSeeded();
     const sql = await getSql();
-    const settingsRow = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
+    const settingsRow = await sql<{
+      value: unknown;
+    }>`select value from settings where key = 'store'`;
     const settings = settingsRow[0] ? mapSettings(settingsRow[0].value) : DEFAULT_SETTINGS;
     const rows = await sql.query<Parameters<typeof mapDetail>[0]>(
       `select ${PRODUCT_SELECT} from products p
        join categories c on c.id = p.category_id
-       where p.slug = $1 and p.published = true and p.archived = false
+       where p.slug = $1 and p.published = true and p.archived = false and p.is_placeholder = false
        limit 1`,
       [data.slug],
     );
     const product = rows[0] ? mapDetail(rows[0]) : null;
-    if (!product) return { settings, product: null, related: [], faqs: [], payments: emptyPayments() };
+    if (!product)
+      return { settings, product: null, related: [], faqs: [], payments: emptyPayments() };
 
     const related = (
       await sql.query<Parameters<typeof mapCard>[0]>(
         `select ${PRODUCT_SELECT} from products p
          join categories c on c.id = p.category_id
-         where p.published = true and p.archived = false and p.id <> $1
+         where p.published = true and p.archived = false and p.is_placeholder = false and p.id <> $1
          order by (p.category_id = $2) desc, p.featured desc
          limit 3`,
         [product.id, product.categoryId],
@@ -177,13 +190,21 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       payments: {
         paystackConfigured: Boolean(env("PAYSTACK_SECRET_KEY")),
         emailConfigured: Boolean(env("RESEND_API_KEY") && env("RESEND_FROM_EMAIL")),
-        bankConfigured: Boolean(settings.bankName && settings.accountName && settings.accountNumber),
+        bankConfigured: Boolean(
+          settings.bankName && settings.accountName && settings.accountNumber,
+        ),
+        demoCheckoutEnabled: isDemoCheckoutEnabled(),
       },
     };
   });
 
 function emptyPayments() {
-  return { paystackConfigured: false, emailConfigured: false, bankConfigured: false };
+  return {
+    paystackConfigured: false,
+    emailConfigured: false,
+    bankConfigured: false,
+    demoCheckoutEnabled: false,
+  };
 }
 
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {

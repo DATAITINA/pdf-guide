@@ -29,7 +29,8 @@ export const Route = createFileRoute("/guides/")({
       { title: `Guides — ${loaderData?.settings.storeName ?? "Fieldnote"}` },
       {
         name: "description",
-        content: "Browse practical digital PDF guides for parenting, money, work, and everyday life.",
+        content:
+          "Browse practical digital PDF guides for parenting, money, work, and everyday life.",
       },
     ],
   }),
@@ -78,7 +79,7 @@ function Catalogue() {
             {search.q ? (
               <button
                 type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1 text-subtle hover:bg-paper-2 hover:text-ink"
+                className="absolute top-1/2 right-2 -translate-y-1/2 grid size-11 place-items-center rounded-full text-subtle transition-colors hover:bg-paper-2 hover:text-ink"
                 aria-label="Clear search"
                 onClick={() => updateSearch({ q: "" })}
               >
@@ -103,8 +104,9 @@ function Catalogue() {
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
+            aria-pressed={!search.category}
             onClick={() => updateSearch({ category: "" })}
-            className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+            className={`min-h-11 rounded-full px-4 text-sm transition-colors ${
               !search.category
                 ? "bg-accent text-accent-fg"
                 : "bg-paper-2 text-ink hover:bg-paper-2/80"
@@ -116,8 +118,9 @@ function Catalogue() {
             <button
               key={c.id}
               type="button"
+              aria-pressed={search.category === c.slug}
               onClick={() => updateSearch({ category: c.slug })}
-              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+              className={`min-h-11 rounded-full px-4 text-sm transition-colors ${
                 search.category === c.slug
                   ? "bg-accent text-accent-fg"
                   : "bg-paper-2 text-ink hover:bg-paper-2/80"
@@ -159,9 +162,9 @@ function Catalogue() {
 
         {data.products.length === 0 ? (
           <div className="mt-16 flex flex-col items-center rounded-[24px] border border-dashed border-line bg-surface px-6 py-16 text-center">
-            <p className="font-display text-2xl tracking-tight">No guides match</p>
+            <p className="font-display text-2xl tracking-tight">No published guides match yet</p>
             <p className="mt-2 max-w-sm text-sm text-muted">
-              Try a different search term, or browse all categories to find something useful.
+              Try removing a filter, or request the topic you hoped to find.
             </p>
             <Button
               type="button"
@@ -174,6 +177,9 @@ function Catalogue() {
             <Link to="/" className="mt-3 text-sm text-accent hover:underline">
               Back to home
             </Link>
+            <a href="/#waitlist" className="mt-2 text-sm font-medium text-accent hover:underline">
+              Suggest a topic
+            </a>
           </div>
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

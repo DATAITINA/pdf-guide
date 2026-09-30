@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { getStorefront } from "@/lib/store/catalog";
+import { contextualPaymentFaqAnswer, paymentStepCopy } from "@/lib/store/payment-copy";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
 import { WaitlistSection } from "@/components/store/waitlist-section";
@@ -11,7 +12,9 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.settings.storeName ?? "Fieldnote"} — Practical Guides for Real Life` },
+      {
+        title: `${loaderData?.settings.storeName ?? "Fieldnote"} — Practical Guides for Real Life`,
+      },
       {
         name: "description",
         content:
@@ -24,17 +27,21 @@ export const Route = createFileRoute("/")({
 function Home() {
   const data = Route.useLoaderData();
   const featured = data.featured.length ? data.featured : data.products.slice(0, 4);
+  const paymentInstructions = paymentStepCopy(data.payments);
 
   return (
     <PageShell settings={data.settings}>
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:pt-16">
         <div>
-          <p className="text-xs font-medium tracking-[0.22em] text-accent uppercase">Digital publisher</p>
+          <p className="text-xs font-medium tracking-[0.22em] text-accent uppercase">
+            Digital publisher
+          </p>
           <h1 className="mt-4 max-w-xl font-display text-[2.5rem] leading-[1.06] text-ink sm:text-[3.4rem]">
             Practical guides for real life.
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-            Clear, actionable PDF guides for parenting, money, work, and everyday decisions — written to use the same day you download them.
+            Clear, actionable PDF guides for real-life challenges — thoughtful, practical, and ready
+            to use the same day you download them.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg">
@@ -64,19 +71,24 @@ function Home() {
         <div className="relative">
           <img
             src="/covers/hero-lineup.jpg"
-            alt="A lineup of Fieldnote guidebooks on a wooden table"
+            alt="A preview of Fieldnote's guide themes; only published guides are available to buy"
             className="w-full rounded-[28px] object-cover shadow-card"
             width={720}
             height={540}
           />
+          <p className="mt-3 text-xs leading-relaxed text-muted">
+            Only published guides are available to buy. Future topics are shaped by reader requests.
+          </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs tracking-[0.22em] text-accent uppercase">Featured</p>
-            <h2 className="mt-2 font-display text-3xl tracking-tight">Guides worth reading</h2>
+            <p className="text-xs tracking-[0.22em] text-accent uppercase">Available now</p>
+            <h2 className="mt-2 font-display text-3xl tracking-tight">
+              Practical help, ready when you are
+            </h2>
           </div>
           <Link
             to="/guides"
@@ -85,11 +97,19 @@ function Home() {
             View all
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {featured.length ? (
+          <div
+            className={`mt-8 grid gap-6 ${featured.length === 1 ? "max-w-sm" : "sm:grid-cols-2 lg:grid-cols-4"}`}
+          >
+            {featured.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-8 rounded-[18px] bg-surface px-5 py-6 text-sm text-muted">
+            New guides are in progress. Tell us what you would like Fieldnote to cover next.
+          </p>
+        )}
         <div className="mt-8 sm:hidden">
           <Button asChild variant="outline" className="w-full">
             <Link to="/guides">View all guides</Link>
@@ -100,9 +120,11 @@ function Home() {
       <section id="categories" className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
           <p className="text-xs tracking-[0.22em] text-accent uppercase">Categories</p>
-          <h2 className="mt-2 font-display text-3xl tracking-tight">Find a guide by the life it helps</h2>
+          <h2 className="mt-2 font-display text-3xl tracking-tight">
+            Find a guide by the life it helps
+          </h2>
           <p className="mt-3 max-w-xl text-sm text-muted">
-            Each category is a destination — open one to see practical titles written for that part of life.
+            Browse topics with published guides, or tell us what would help you next.
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {data.categories.map((cat) => (
@@ -112,10 +134,23 @@ function Home() {
                 search={{ category: cat.slug }}
                 className="group rounded-[20px] border border-line bg-paper px-5 py-5 transition-all duration-200 hover:border-accent/35 hover:shadow-[0_8px_24px_rgb(28_25_22_/0.06)]"
               >
-                <p className="font-medium text-ink transition-colors group-hover:text-accent">{cat.name}</p>
+                <p className="font-medium text-ink transition-colors group-hover:text-accent">
+                  {cat.name}
+                </p>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted">{cat.description}</p>
               </Link>
             ))}
+            <a
+              href="#waitlist"
+              className="group rounded-[20px] border border-dashed border-accent/40 bg-paper px-5 py-5 transition-all duration-200 hover:border-accent hover:shadow-[0_8px_24px_rgb(28_25_22_/0.06)]"
+            >
+              <p className="font-medium text-ink transition-colors group-hover:text-accent">
+                Suggest a future guide
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                Vote for a topic and get a launch voucher when it is published.
+              </p>
+            </a>
           </div>
         </div>
       </section>
@@ -144,8 +179,11 @@ function Home() {
       <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
         <div className="grid gap-8 rounded-[28px] bg-accent px-6 py-10 text-accent-fg sm:px-10 md:grid-cols-3 md:gap-6">
           {[
-            ["1. Choose a guide", "Open a title, read what’s inside, and decide if it fits your situation."],
-            ["2. Pay securely", "Checkout with Paystack, or send a bank transfer for approval."],
+            [
+              "1. Choose a guide",
+              "Open a title, read what’s inside, and decide if it fits your situation.",
+            ],
+            ["2. Choose an available method", paymentInstructions],
             ["3. Download instantly", "After payment is confirmed, the PDF unlocks for you."],
           ].map(([title, copy], i) => (
             <div key={title}>
@@ -163,14 +201,17 @@ function Home() {
         <p className="text-xs tracking-[0.22em] text-accent uppercase">FAQ</p>
         <h2 className="mt-2 font-display text-3xl tracking-tight">Before you buy</h2>
         <div className="mt-8 divide-y divide-line border-y border-line">
-          {data.faqs.map((faq) => (
-            <details key={faq.id} className="group py-4">
-              <summary className="cursor-pointer list-none font-medium after:float-right after:text-subtle after:content-['+'] group-open:after:content-['–']">
-                {faq.question}
-              </summary>
-              <p className="mt-2 pr-8 text-sm leading-relaxed text-muted">{faq.answer}</p>
-            </details>
-          ))}
+          {data.faqs.map((faq) => {
+            const answer = contextualPaymentFaqAnswer(faq.question, faq.answer, data.payments);
+            return (
+              <details key={faq.id} className="group py-4">
+                <summary className="cursor-pointer list-none font-medium after:float-right after:text-subtle after:content-['+'] group-open:after:content-['–']">
+                  {faq.question}
+                </summary>
+                <p className="mt-2 pr-8 text-sm leading-relaxed text-muted">{answer}</p>
+              </details>
+            );
+          })}
         </div>
         <p className="mt-6 text-center text-sm text-muted">
           Still unsure?{" "}
