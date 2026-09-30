@@ -5,6 +5,7 @@ import { UserButton } from "@/lib/auth/gates";
 import type { StoreSettings } from "@/lib/store/types";
 
 const navLinks = [
+  { to: "/" as const, label: "Home" },
   { to: "/guides" as const, label: "Guides" },
   { to: "/about" as const, label: "About" },
   { to: "/faq" as const, label: "FAQ" },
@@ -39,6 +40,7 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
               key={link.to}
               to={link.to}
               className="rounded-[10px] px-3 py-2 text-ink/90 transition-colors hover:bg-paper-2 hover:text-ink"
+              activeOptions={{ exact: link.to === "/" }}
             >
               {link.label}
             </Link>
@@ -93,6 +95,7 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
                 key={link.to}
                 to={link.to}
                 className="rounded-[12px] px-4 py-3 text-base font-medium transition-colors hover:bg-paper-2"
+                activeOptions={{ exact: link.to === "/" }}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -137,6 +140,11 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
         <div>
           <p className="text-xs tracking-[0.16em] text-subtle uppercase">Explore</p>
           <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <Link to="/" className="transition-colors hover:text-accent">
+                Home
+              </Link>
+            </li>
             <li>
               <Link to="/guides" className="transition-colors hover:text-accent">
                 All guides
