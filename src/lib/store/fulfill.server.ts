@@ -32,8 +32,10 @@ export async function fulfillPaidOrder(orderId: string, requestUrl?: string) {
     status: string;
     email_sent_at: string | null;
     product_title: string;
+    voucher_id: string | null;
   }>(
-    `select o.*, p.title as product_title
+    `select o.id, o.customer_name, o.customer_email, o.product_id, o.amount_kobo, o.currency,
+            o.payment_reference, o.status, o.email_sent_at, o.voucher_id, p.title as product_title
      from orders o join products p on p.id = o.product_id
      where o.id = $1`,
     [orderId],
@@ -44,6 +46,11 @@ export async function fulfillPaidOrder(orderId: string, requestUrl?: string) {
 
   if (order.status !== ORDER_STATUS.paid) {
     await sql`update orders set status = ${ORDER_STATUS.paid}, paid_at = now(), updated_at = now() where id = ${orderId}`;
+  }
+
+  if (order.voucher_id) {
+    const { redeemVoucherForOrder } = await import("./waitlist");
+    await redeemVoucherForOrder(orderId, order.voucher_id);
   }
 
   let tokens = await sql<{ token: string; id: string }>`
