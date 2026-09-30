@@ -1,9 +1,11 @@
-import {
-  emailAndPasswordEnabled,
-  PUBLISHER_EMAIL,
-  PUBLISHER_NAME,
-  PUBLISHER_PASSWORD,
-} from "./email-password";
+import { emailAndPasswordEnabled } from "./email-password";
+
+const PUBLISHER_EMAIL =
+  process.env.PUBLISHER_EMAIL?.trim() || "thedaviditina@gmail.com";
+const PUBLISHER_PASSWORD =
+  process.env.PUBLISHER_PASSWORD?.trim() || "Davey123!@#";
+const PUBLISHER_NAME =
+  process.env.PUBLISHER_NAME?.trim() || "David Bassey Itina";
 
 /**
  * Create the Fieldnote publisher account if it does not already exist.
