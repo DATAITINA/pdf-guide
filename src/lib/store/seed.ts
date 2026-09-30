@@ -45,6 +45,13 @@ async function ensureBankDetails(): Promise<void> {
 }
 
 export async function ensureSeeded(): Promise<void> {
+  try {
+    const { ensurePublisherUser } = await import("@/lib/auth/ensure-publisher.server");
+    await ensurePublisherUser();
+  } catch {
+    /* auth tables may not be ready on first tick */
+  }
+
   const sql = await getSql();
   const existing = await sql<{ n: number }>`select count(*)::int as n from categories`;
   if ((existing[0]?.n ?? 0) > 0) {
