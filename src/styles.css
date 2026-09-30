@@ -38,6 +38,8 @@
   }
   body {
     font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
     background: var(--color-paper);
     color: var(--color-ink);
   }
@@ -45,13 +47,32 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Display serif: same clean Fraunces, less tall/stretched */
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  .font-display {
     font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 36, "SOFT" 40, "WONK" 0;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.18;
     text-wrap: balance;
-    letter-spacing: -0.03em;
+  }
+  h1 {
+    font-variation-settings: "opsz" 48, "SOFT" 35, "WONK" 0;
+    line-height: 1.12;
+  }
+  h2 {
+    font-variation-settings: "opsz" 40, "SOFT" 40, "WONK" 0;
+    line-height: 1.15;
+  }
+  h3,
+  h4 {
+    font-variation-settings: "opsz" 28, "SOFT" 45, "WONK" 0;
+    line-height: 1.22;
   }
   p {
     text-wrap: pretty;
