@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { getStorefront } from "@/lib/store/catalog";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
+import { WaitlistSection } from "@/components/store/waitlist-section";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -23,7 +24,6 @@ export const Route = createFileRoute("/")({
 function Home() {
   const data = Route.useLoaderData();
   const featured = data.featured.length ? data.featured : data.products.slice(0, 4);
-  const realGuides = data.products.filter((p) => !p.isPlaceholder);
 
   return (
     <PageShell settings={data.settings}>
@@ -157,24 +157,7 @@ function Home() {
         </div>
       </section>
 
-      {realGuides.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs tracking-[0.22em] text-accent uppercase">Available now</p>
-              <h2 className="mt-2 font-display text-3xl tracking-tight">Ready to download</h2>
-            </div>
-            <Link to="/guides" className="hidden text-sm font-medium text-accent hover:underline sm:inline">
-              Browse all
-            </Link>
-          </div>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {realGuides.slice(0, 3).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <WaitlistSection />
 
       <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
         <p className="text-xs tracking-[0.22em] text-accent uppercase">FAQ</p>
