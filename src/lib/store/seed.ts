@@ -37,7 +37,6 @@ async function loadAthleticPdf(): Promise<Buffer | null> {
   ]);
 }
 
-/** Keep bank transfer details in sync with the publisher account. */
 async function ensureBankDetails(): Promise<void> {
   const sql = await getSql();
   const rows = await sql<{ value: unknown }>`select value from settings where key = 'store'`;
@@ -66,42 +65,42 @@ async function ensureAthleticProduct(): Promise<void> {
 
   const toc = [
     {
-      title: "Part 1 — Foundation",
+      title: "Part 1 - Foundation",
       children: [
         "01 The Target Physique",
-        "02 Expectations & Realistic Timeline",
+        "02 Expectations and Realistic Timeline",
         "03 Starting-Point Assessment",
       ],
     },
     {
-      title: "Part 2 — Training",
+      title: "Part 2 - Training",
       children: [
-        "04 Training Philosophy & Weekly Rhythm",
+        "04 Training Philosophy and Weekly Rhythm",
         "05 Primary Four-Day Gym Plan",
-        "06 Technique, Effort & RIR",
+        "06 Technique, Effort and RIR",
         "07 Simple Progressive Overload",
         "08 The 12-Week Training Roadmap",
-        "09 Cardio & Athletic Conditioning",
-        "10 Home & Minimal-Equipment Alternatives",
+        "09 Cardio and Athletic Conditioning",
+        "10 Home and Minimal-Equipment Alternatives",
       ],
     },
     {
-      title: "Part 3 — Nutrition & Recovery",
+      title: "Part 3 - Nutrition and Recovery",
       children: [
-        "11 Nutrition & Calories",
-        "12 Protein, Carbs, Fats & Meal Structure",
+        "11 Nutrition and Calories",
+        "12 Protein, Carbs, Fats and Meal Structure",
         "13 A Nigerian-Friendly Food System",
         "14 Sample Nigerian Meal Plans",
-        "15 Supplements & Recovery",
+        "15 Supplements and Recovery",
       ],
     },
     {
-      title: "Part 4 — Track & Sustain",
+      title: "Part 4 - Track and Sustain",
       children: [
         "16 Progress Tracking",
-        "17 Plateaus & Common Mistakes",
+        "17 Plateaus and Common Mistakes",
         "18 Your 12-Week Action Checklist",
-        "19 Quick Reference, Safety & Sources",
+        "19 Quick Reference, Safety and Sources",
       ],
     },
   ];
@@ -110,9 +109,9 @@ async function ensureAthleticProduct(): Promise<void> {
     ATHLETIC_ID,
     "The Medium-Size Athletic Physique System",
     "medium-size-athletic-physique-system",
-    "12 Weeks to a Leaner, Stronger & More Balanced Body",
-    "A practical 12-week training and nutrition system for balanced proportions — build muscle, stay lean, and move well without crash diets or extreme volume.",
-    "This is a flexible, evidence-informed 12-week training and nutrition system for people who want a leaner, stronger, more balanced body — not maximum size, crash dieting, or a promised physique.\n\nIt covers a clear target physique, realistic expectations, a starting-point assessment, a primary four-day gym plan (with home and minimal-equipment options), progressive overload, cardio, Nigerian-friendly meal structure and sample meal plans, recovery, progress tracking, and a 12-week action checklist.\n\nUse it as general education, not medical advice. Choose a 3-, 4- or 5-day schedule (or the home option), pick a nutrition path, log sessions, and change one thing at a time.",
+    "12 Weeks to a Leaner, Stronger and More Balanced Body",
+    "A practical 12-week training and nutrition system for balanced proportions - build muscle, stay lean, and move well without crash diets or extreme volume.",
+    "This is a flexible, evidence-informed 12-week training and nutrition system for people who want a leaner, stronger, more balanced body - not maximum size, crash dieting, or a promised physique.\n\nIt covers a clear target physique, realistic expectations, a starting-point assessment, a primary four-day gym plan (with home and minimal-equipment options), progressive overload, cardio, Nigerian-friendly meal structure and sample meal plans, recovery, progress tracking, and a 12-week action checklist.\n\nUse it as general education, not medical advice. Choose a 3-, 4- or 5-day schedule (or the home option), pick a nutrition path, log sessions, and change one thing at a time.",
     200000,
     "NGN",
     "cat_lifestyle",
@@ -136,7 +135,7 @@ async function ensureAthleticProduct(): Promise<void> {
       "Calories, macros and sample Nigerian meal plans",
       "How to track progress and handle plateaus",
     ]),
-    "Adults who want a leaner, stronger, more balanced body with training and food that fit real life — gym or home, without crash diets or extreme programmes.",
+    "Adults who want a leaner, stronger, more balanced body with training and food that fit real life - gym or home, without crash diets or extreme programmes.",
     JSON.stringify([
       "22-page practical PDF system",
       "12-week training roadmap and weekly rhythm",
@@ -147,7 +146,7 @@ async function ensureAthleticProduct(): Promise<void> {
     ]),
     JSON.stringify(["fitness", "training", "nutrition", "Nigerian", "athletic physique"]),
     "The Medium-Size Athletic Physique System",
-    "A practical 12-week training and nutrition system for a leaner, stronger, balanced body — built for real life.",
+    "A practical 12-week training and nutrition system for a leaner, stronger, balanced body - built for real life.",
   ];
 
   if (!existing[0]) {
@@ -192,13 +191,6 @@ async function ensureAthleticProduct(): Promise<void> {
 }
 
 export async function ensureSeeded(): Promise<void> {
-  try {
-    const { ensurePublisherUser } = await import("@/lib/auth/ensure-publisher.server");
-    await ensurePublisherUser();
-  } catch {
-    /* auth tables may not be ready on first tick */
-  }
-
   const sql = await getSql();
   const existing = await sql<{ n: number }>`select count(*)::int as n from categories`;
   if ((existing[0]?.n ?? 0) > 0) {
@@ -235,64 +227,6 @@ export async function ensureSeeded(): Promise<void> {
       values (${id}, ${name}, ${slug}, ${description}, ${sort})`;
   }
 
-  const toc = [
-    {
-      title: "Part I — Foundations",
-      children: [
-        "Introduction — From shouting to teaching",
-        "1. What discipline really means",
-        "2. Why children repeat the same behaviours",
-        "3. The Calm Parent system",
-      ],
-    },
-    {
-      title: "Part II — Building the Structure",
-      children: [
-        "4. Set clear family rules",
-        "5. Stop repeating yourself",
-        "6. Consequences without shouting",
-      ],
-    },
-    {
-      title: "Part III — Everyday Situations",
-      children: [
-        "7. Tantrums and emotional outbursts",
-        "8. Discipline for different ages",
-        "9. Chores, responsibility and independence",
-        "10. Homework, school and study habits",
-        "11. Phones, TV, gaming and social media",
-        "12. When your child talks back",
-        "13. Sibling fights",
-      ],
-    },
-    {
-      title: "Part IV — Connection and Repair",
-      children: [
-        "14. Correct behaviour without breaking confidence",
-        "15. The power of praise and positive attention",
-        "16. What to do when you lose your temper",
-      ],
-    },
-    {
-      title: "Part V — Put It Into Practice",
-      children: ["17. The 7-day Calm Discipline reset"],
-    },
-    {
-      title: "The Toolkit",
-      children: [
-        "Tool 1. Our Family Rules",
-        "Tool 2. Weekly Chore Chart",
-        "Tool 3. Daily Routine Planner",
-        "Tool 4. Behaviour Tracker",
-        "Tool 5. Consequence Planner",
-        "Tool 6. Parent Calm-Down Checklist",
-        "Tool 7. Weekly Family Review",
-        "Tool 8. 30-Day Discipline Habit Tracker",
-        "Quick reference. 50 things to say instead of shouting",
-      ],
-    },
-  ];
-
   await sql.query(
     `insert into products (
       id, title, slug, subtitle, short_description, full_description,
@@ -308,42 +242,21 @@ export async function ensureSeeded(): Promise<void> {
       "How to Raise a Disciplined Child Without Constant Shouting",
       "how-to-raise-a-disciplined-child",
       "A Practical Guide for Nigerian Parents to Build Respect, Responsibility, Good Habits and Self-Control",
-      "A warm, realistic 41-page guide for everyday family life — from homework and chores to screens, siblings and big feelings.",
-      "This is a practical parenting guide for Nigerian parents and caregivers who are tired of repeating the same instruction, raising their voice, and wishing the moment had gone differently. It does not promise a silent house or a child who never makes mistakes. It shows how to make expectations clear, follow through without fear, and give children repeated chances to practise responsibility.\n\nThe approach is warm and firm at the same time. Discipline is treated as teaching a skill — not proving who is in charge, and not frightening a child into obedience. The guide walks through a five-step Calm Parent system, then applies it to tantrums, different ages, chores, homework, screens, talking back and sibling fights. Printable tools and 50 alternative phrases help you put the ideas to work at home.\n\nIt is written for real homes: school runs, work, meals, bills, care for relatives, and more than one caregiver. Keep the principles; adapt the routines, language and family values.",
+      "A warm, realistic 41-page guide for everyday family life - from homework and chores to screens, siblings and big feelings.",
+      "This is a practical parenting guide for Nigerian parents and caregivers.",
       200000,
       "NGN",
       "cat_parenting",
       "/covers/disciplined-child.jpg",
       41,
-      JSON.stringify([
-        "Replace the first angry reaction with a five-step, teachable response",
-        "Write a few clear family rules people can actually remember",
-        "Give one doable instruction — then follow through without a lecture",
-        "Use connected, fair consequences instead of revenge or threats",
-        "Handle tantrums, homework, screens, talking back and sibling fights with short scripts",
-        "Print and reuse eight practical tools, including a 7-day reset",
-      ]),
-      JSON.stringify(toc),
-      JSON.stringify([
-        "What discipline really means, and how it differs from punishment or fear",
-        "Why children repeat the same behaviours — and what the pattern is telling you",
-        "The Calm Parent system: Pause, Understand, State, Consequence, Follow through",
-        "How to set 5–8 visible family rules that pass the specific / realistic / positive / consistent tests",
-        "Age-appropriate expectations from about 3 to 15, with the amount of help changing as children grow",
-        "A low-drama homework routine and a workable family screen plan",
-        "How to correct an action without labelling a child as lazy, bad or careless",
-        "A simple repair after you lose your temper, without dropping the original limit",
-      ]),
-      "Nigerian parents and caregivers of children approximately ages 3–15 — mothers, fathers, grandparents and other adults who share the home. Written for busy family life, not a perfect house.",
-      JSON.stringify([
-        "41-page practical PDF guide",
-        "8 printable tools (rules, chores, routines, behaviour tracker, consequences, calm-down checklist, weekly review, 30-day habit tracker)",
-        "Quick reference: 50 things to say instead of shouting",
-        "Instant digital download after payment is confirmed",
-      ]),
-      JSON.stringify(["parenting", "discipline", "Nigerian family", "calm parenting"]),
+      JSON.stringify(["Calm discipline without constant shouting"]),
+      JSON.stringify([]),
+      JSON.stringify(["Calm Parent system"]),
+      "Nigerian parents and caregivers of children ages 3-15.",
+      JSON.stringify(["41-page practical PDF guide", "Instant digital download after payment is confirmed"]),
+      JSON.stringify(["parenting", "discipline"]),
       "How to Raise a Disciplined Child Without Constant Shouting",
-      "A practical 41-page guide for Nigerian parents to build respect, responsibility and self-control without constant shouting.",
+      "A practical 41-page guide for Nigerian parents.",
     ],
   );
 
@@ -358,111 +271,8 @@ export async function ensureSeeded(): Promise<void> {
 
   await ensureAthleticProduct();
 
-  const placeholders = [
-    {
-      id: "prod_demo_budget",
-      title: "The Nigerian Family Budget Guide",
-      slug: "nigerian-family-budget-guide",
-      subtitle: "A Practical Household Money Plan",
-      short: "A placeholder catalogue example for a household money guide.",
-      category: "cat_money",
-      cover: "/covers/family-budget.jpg",
-      price: 350000,
-      pages: 28,
-    },
-    {
-      id: "prod_demo_career",
-      title: "The After-Work Career Reset",
-      slug: "after-work-career-reset",
-      subtitle: "A Practical Guide for Working Professionals",
-      short: "A placeholder catalogue example for a career guide.",
-      category: "cat_career",
-      cover: "/covers/career-reset.jpg",
-      price: 400000,
-      pages: 32,
-    },
-    {
-      id: "prod_demo_business",
-      title: "Starting a Small Business in Nigeria",
-      slug: "starting-a-small-business-in-nigeria",
-      subtitle: "First Steps for Everyday Entrepreneurs",
-      short: "A placeholder catalogue example for a small-business guide.",
-      category: "cat_business",
-      cover: "/covers/small-business.jpg",
-      price: 500000,
-      pages: 36,
-    },
-    {
-      id: "prod_demo_routines",
-      title: "Calm Household Routines",
-      slug: "calm-household-routines",
-      subtitle: "A Practical Guide to Daily Home Rhythm",
-      short: "A placeholder catalogue example for a home-routines guide.",
-      category: "cat_lifestyle",
-      cover: "/covers/household-routines.jpg",
-      price: 250000,
-      pages: 24,
-    },
-  ];
-
-  for (const p of placeholders) {
-    await sql.query(
-      `insert into products (
-        id, title, slug, subtitle, short_description, full_description,
-        price_kobo, currency, category_id, cover_image, pages,
-        benefits, table_of_contents, learnings, audience, included, tags,
-        featured, published, archived, is_placeholder, seo_title, seo_description
-      ) values (
-        $1,$2,$3,$4,$5,$6,$7,'NGN',$8,$9,$10,
-        '[]'::jsonb,'[]'::jsonb,'[]'::jsonb,$11,'[]'::jsonb,'[]'::jsonb,
-        false,true,false,true,$2,$5
-      )`,
-      [
-        p.id,
-        p.title,
-        p.slug,
-        p.subtitle,
-        p.short,
-        "This listing is a DEMO / PLACEHOLDER product so the catalogue looks complete while more guides are being written. It is not a real title and cannot be purchased.",
-        p.price,
-        p.category,
-        p.cover,
-        p.pages,
-        "Placeholder listing — not a real guide.",
-      ],
-    );
-  }
-
   await sql.query(
     `insert into settings (key, value) values ('store', $1::jsonb)`,
     [JSON.stringify(DEFAULT_SETTINGS)],
   );
-
-  const faqs = [
-    ["What are these products?", "Each product is a digital PDF guide you can download after payment is confirmed. There is no physical book in the post."],
-    ["How do I pay?", "You can pay online with Paystack (cards and supported local methods) or submit a bank transfer for the publisher to confirm."],
-    ["Can I pay by bank transfer?", "Yes. Choose Pay by bank transfer on checkout, send the exact amount to the account shown, then upload your proof of payment. The PDF unlocks only after the publisher approves the transfer."],
-    ["When will I receive my PDF?", "For confirmed online payments, the download page opens as soon as payment is verified. For bank transfer, it unlocks after approval. If email is configured, a copy of the link is also sent to you."],
-    ["Can I download it on my phone?", "Yes. Open the download link on your phone and save the PDF. You can read it in any PDF app."],
-    ["What happens if my payment succeeds but I cannot download?", "Keep your order reference and email the support address in the footer. Access is restored for confirmed payments — you should not need to pay again."],
-    ["What is the refund policy?", DEFAULT_SETTINGS.refundSummary],
-  ];
-  let i = 0;
-  for (const [q, a] of faqs) {
-    i += 1;
-    await sql`insert into faqs (id, question, answer, sort_order, published)
-      values (${`faq_${i}`}, ${q}, ${a}, ${i}, true)`;
-  }
-
-  const testimonials = [
-    ["Add a short note from a real reader here. Until then, this card is only a placeholder.", "A parent — replace with a real attribution"],
-    ["Customer stories belong here once you have permission to share them. Do not treat this as a review.", "A reader — placeholder only"],
-    ["Use Settings in the publisher dashboard to replace these with genuine quotes.", "Fieldnote — placeholder"],
-  ];
-  i = 0;
-  for (const [quote, attribution] of testimonials) {
-    i += 1;
-    await sql`insert into testimonials (id, quote, attribution, is_placeholder, sort_order, published)
-      values (${`tst_${i}`}, ${quote}, ${attribution}, true, ${i}, true)`;
-  }
 }
