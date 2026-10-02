@@ -449,14 +449,14 @@ test("strips install params from the app link", () => {
 });
 
 test("names the install page from host slug", () => {
-  assert.equal(appNameFromHost("localhost:8080"), "Grok App");
-  assert.equal(appNameFromHost("172.17.154.217:8080"), "Grok App");
+  assert.equal(appNameFromHost("localhost:8080"), "Fieldnote");
+  assert.equal(appNameFromHost("172.17.154.217:8080"), "Fieldnote");
   assert.equal(appNameFromHost("wild-race.grok.me"), "Wild Race");
 });
 
 test("rejects hosts that are not plain slugs", () => {
-  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Grok App");
-  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Grok App");
+  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Fieldnote");
+  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Fieldnote");
 });
 
 test("renders install page markup", () => {
@@ -477,7 +477,22 @@ test("renders the manifest with the per-app name", () => {
   const manifest = JSON.parse(renderWebManifest("wild-race.grok.me"));
   assert.equal(manifest.name, "Wild Race");
   assert.equal(manifest.short_name, "Wild Race");
-  assert.equal(manifest.icons[0].src, "/__grok/icon-180.png");
+  assert.deepEqual(
+    manifest.icons.map(({ src, sizes }) => [src, sizes]),
+    [
+      ["/__grok/icon-180.png", "180x180"],
+      ["/__grok/icon-192.png", "192x192"],
+      ["/__grok/icon-512.png", "512x512"],
+    ],
+  );
+  assert.equal(manifest.theme_color, "#1A4D47");
+  assert.equal(manifest.background_color, "#F8F4E9");
+});
+
+test("uses the Fieldnote app name for non-grok production hosts", () => {
+  const manifest = JSON.parse(renderWebManifest("usefieldnote.vercel.app"));
+  assert.equal(manifest.name, "Fieldnote");
+  assert.equal(manifest.short_name, "Fieldnote");
 });
 
 // Tripwires: the deployed-app path only works if Nitro scans server/ — an
@@ -495,6 +510,8 @@ test("nitro middleware and its bundled assets exist", () => {
   assert.match(middleware, /virtual:grok-og-identity/);
   readFileSync(join(TEMPLATE_ROOT, "scripts/install-page.html"));
   readFileSync(join(TEMPLATE_ROOT, "public/__grok/icon-180.png"));
+  readFileSync(join(TEMPLATE_ROOT, "public/__grok/icon-192.png"));
+  readFileSync(join(TEMPLATE_ROOT, "public/__grok/icon-512.png"));
   readFileSync(join(TEMPLATE_ROOT, "public/__grok/install/styles.css"));
 });
 
@@ -503,4 +520,3 @@ test("vite plugin bakes og identity as a virtual module", () => {
   assert.match(plugin, /virtual:grok-og-identity/);
   assert.match(plugin, /snapshotOgIdentity/);
 });
-
