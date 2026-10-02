@@ -115,7 +115,7 @@ async function ensureAthleticProduct(): Promise<void> {
     200000,
     "NGN",
     "cat_lifestyle",
-    "/covers/athletic-physique.svg",
+    "/covers/athletic-physique.jpg",
     22,
     JSON.stringify([
       "Follow a clear 12-week roadmap for training and nutrition",
