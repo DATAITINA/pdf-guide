@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
   loader: () => getSiteSettings(),
   component: About,
   head: ({ loaderData }) => ({
-    meta: [{ title: `About — ${loaderData?.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `About — ${loaderData?.storeName ?? "Cairn"}` }],
   }),
 });
 
