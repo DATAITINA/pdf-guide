@@ -20,7 +20,7 @@ function track(event: string, payload?: Record<string, string>) {
   }
 }
 
-export function WaitlistSection() {
+export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null }) {
   const [presets, setPresets] = useState<string[]>([]);
   const [board, setBoard] = useState<TopicBoardItem[]>([]);
   const [threshold, setThreshold] = useState(TOPIC_REQUEST_THRESHOLD);
@@ -89,6 +89,10 @@ export function WaitlistSection() {
       setError("Pick a topic, or type one under Other.");
       return;
     }
+    if (!whatsapp.trim()) {
+      setError("WhatsApp number is required so we can send your guide.");
+      return;
+    }
     if (!consent) {
       setError("Please agree to be contacted about this guide.");
       return;
@@ -100,7 +104,7 @@ export function WaitlistSection() {
         data: {
           topic,
           email,
-          whatsapp: whatsapp || undefined,
+          whatsapp: whatsapp.trim(),
           consent: true,
           honeypot,
         },
@@ -115,7 +119,7 @@ export function WaitlistSection() {
       const boardData = await getWaitlistBoard();
       setBoard(boardData.topics);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not join the list.");
+      setError(err instanceof Error ? err.message : "Could not submit your request.");
     } finally {
       setPending(false);
     }
@@ -135,14 +139,31 @@ export function WaitlistSection() {
 
   return (
     <section id="waitlist" className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <p className="text-xs tracking-[0.22em] text-accent uppercase">Next guides</p>
-      <h2 className="mt-2 font-display text-3xl tracking-tight">Tell me what to write next.</h2>
+      <p className="text-xs tracking-[0.22em] text-accent uppercase">Personal guide</p>
+      <h2 className="mt-2 font-display text-3xl tracking-tight">Request your personal guide</h2>
       <p className="mt-3 text-muted">
-        Pick a topic you need. Join the list and get a ₦1,500 voucher for that guide when it launches.
+        Tell us the situation you’re dealing with. We’ll write a practical guide for it and send it on WhatsApp.
       </p>
       <p className="mt-2 text-sm text-muted">
-        This voucher is for future guides, not the one already available.
+        What happens next: we confirm on WhatsApp, agree the scope, then write and deliver your guide with check-ins.
       </p>
+      <p className="mt-2 text-sm text-muted">
+        This voucher is for future guides, not the ones already available.
+      </p>
+
+      {whatsappLink ? (
+        <p className="mt-4 text-sm">
+          Prefer to start by chat?{" "}
+          <a
+            href={whatsappLink}
+            className="font-medium text-accent hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Chat on WhatsApp
+          </a>
+        </p>
+      ) : null}
 
       <div className="relative mt-8 min-h-[320px]">
         {ticket ? (
@@ -155,16 +176,13 @@ export function WaitlistSection() {
             <div className="ticket-card rounded-[18px] border border-dashed border-accent/40 bg-surface px-6 py-7 shadow-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">Your voucher</p>
+                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">Request received</p>
                   <p className="mt-1 font-display text-xl tracking-tight">{ticket.topicName}</p>
                   <p className="mt-1 text-sm text-muted">
                     You're #{ticket.position} for this topic
                     {ticket.duplicate ? " · already on the list" : ""}
                   </p>
                 </div>
-                <span className="text-2xl" aria-hidden>
-                  🌱
-                </span>
               </div>
               <p className="mt-6 font-mono text-2xl tracking-[0.12em] text-ink tabular-nums">{revealed || "· · ·"}</p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -180,20 +198,22 @@ export function WaitlistSection() {
                   )}
                 </Button>
               </div>
-              <p className="mt-4 text-sm text-muted">We'll email you the moment it's live.</p>
+              <p className="mt-4 text-sm text-muted">
+                We’ll message you on WhatsApp to confirm details and next steps.
+              </p>
             </div>
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-5" noValidate>
             <div>
-              <p className="mb-2 text-sm font-medium">Topic</p>
+              <p className="mb-2 text-sm font-medium">What’s the situation?</p>
               <div className="flex flex-wrap gap-2">
                 {presets.map((name) => (
                   <button
                     key={name}
                     type="button"
                     onClick={() => pickTopic(name)}
-                    className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                    className={`min-h-11 rounded-full px-3.5 py-2 text-sm transition-colors ${
                       selected === name && !otherOpen
                         ? "bg-accent text-accent-fg"
                         : "bg-paper-2 text-ink hover:bg-paper-2/80"
@@ -205,7 +225,7 @@ export function WaitlistSection() {
                 <button
                   type="button"
                   onClick={pickOther}
-                  className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                  className={`min-h-11 rounded-full px-3.5 py-2 text-sm transition-colors ${
                     otherOpen ? "bg-accent text-accent-fg" : "bg-paper-2 text-ink hover:bg-paper-2/80"
                   }`}
                 >
@@ -214,10 +234,10 @@ export function WaitlistSection() {
               </div>
               {otherOpen ? (
                 <Input
-                  className="mt-3"
+                  className="mt-3 min-h-12"
                   value={otherText}
                   onChange={(e) => setOtherText(e.target.value.slice(0, 80))}
-                  placeholder="Type a short topic (max 80 characters)"
+                  placeholder="Describe it in a few words (max 80 characters)"
                   maxLength={80}
                   aria-label="Custom topic"
                 />
@@ -226,7 +246,7 @@ export function WaitlistSection() {
 
             <div>
               <label htmlFor="waitlist-email" className="mb-1.5 block text-sm font-medium">
-                Email
+                Name or email
               </label>
               <Input
                 id="waitlist-email"
@@ -236,20 +256,26 @@ export function WaitlistSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
+                className="min-h-12"
               />
             </div>
 
             <div>
               <label htmlFor="waitlist-wa" className="mb-1.5 block text-sm font-medium">
-                WhatsApp <span className="font-normal text-muted">(optional)</span>
+                WhatsApp number <span className="text-danger">*</span>
               </label>
               <Input
                 id="waitlist-wa"
                 type="tel"
+                required
+                autoComplete="tel"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="Get a WhatsApp alert when it launches"
+                placeholder="e.g. 0803 123 4567"
+                className="min-h-12"
+                aria-required="true"
               />
+              <p className="mt-1.5 text-xs text-muted">Required — we’ll send your guide and check-ins here.</p>
             </div>
 
             {/* Honeypot */}
@@ -267,13 +293,14 @@ export function WaitlistSection() {
             <label className="flex items-start gap-3 text-sm leading-relaxed text-muted">
               <input
                 type="checkbox"
-                className="mt-1 size-4 rounded border-line accent-[var(--color-accent)]"
+                className="mt-1 size-5 shrink-0 rounded border-line accent-[var(--color-accent)]"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
                 required
               />
               <span>
-                I agree to be contacted about this guide. Data handled per the Nigeria Data Protection Act.
+                I agree to be contacted about this guide on WhatsApp or email. Data handled per the Nigeria Data
+                Protection Act.
               </span>
             </label>
 
@@ -283,13 +310,13 @@ export function WaitlistSection() {
               </p>
             ) : null}
 
-            <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
+            <Button type="submit" size="lg" disabled={pending} className="min-h-12 w-full sm:w-auto">
               {pending ? (
                 <>
-                  <Loader2 className="size-4 animate-spin" /> Joining…
+                  <Loader2 className="size-4 animate-spin" /> Sending…
                 </>
               ) : (
-                "Join the list"
+                "Request your personal guide"
               )}
             </Button>
           </form>
@@ -298,7 +325,7 @@ export function WaitlistSection() {
 
       <div className="mt-12 border-t border-line pt-10">
         <p className="text-sm font-medium">Requested topics</p>
-        <p className="mt-1 text-sm text-muted">The most requested topic gets written first.</p>
+        <p className="mt-1 text-sm text-muted">The most requested topic helps us decide what to write next.</p>
         {board.length === 0 ? (
           <p className="mt-6 text-sm text-muted">Be the first to request a topic above.</p>
         ) : (
