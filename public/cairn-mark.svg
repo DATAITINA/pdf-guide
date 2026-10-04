@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
-  <title id="title">Cairn</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Cairn mark</title>
+  <desc id="desc">Three angular stones forming a cairn.</desc>
   <rect x="1" y="1" width="62" height="62" rx="18" fill="#1A4D47"/>
   <path d="M10 51 17 41h30l7 10H10Z" fill="#E9E5D8"/>
   <path d="m15 38 7-11h20l7 11H15Z" fill="#F4F0E5"/>
