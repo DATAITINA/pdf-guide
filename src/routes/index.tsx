@@ -11,11 +11,11 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.settings.storeName ?? "Fieldnote"} — Practical Guides for Real Life` },
+      { title: `${loaderData?.settings.storeName ?? "Cairn"} — Small steps, clearly marked.` },
       {
         name: "description",
         content:
-          "Discover practical digital guides designed to help you navigate parenting, relationships, money, business, career and everyday life.",
+          "Tell us your problem. Get a practical guide made for you. Clear digital guides for everyday life, delivered on WhatsApp.",
       },
     ],
   }),
@@ -27,23 +27,25 @@ function Home() {
 
   return (
     <PageShell settings={data.settings}>
+      {/* Hero */}
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:pt-16">
         <div>
-          <p className="text-xs font-medium tracking-[0.22em] text-accent uppercase">Digital publisher</p>
+          <p className="text-xs font-medium tracking-[0.22em] text-accent uppercase">Personal guides</p>
           <h1 className="mt-4 max-w-xl font-display text-[2.5rem] leading-[1.06] text-ink sm:text-[3.4rem]">
-            Practical guides for real life.
+            Tell us your problem. Get a guide made for you.
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-            Clear, actionable PDF guides for parenting, money, work, and everyday decisions — written to use the same day you download them.
+            Clear, practical guides for the situations that actually come up at home and at work.
+            Your guide arrives on WhatsApp — no app to download.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button asChild size="lg">
-              <Link to="/guides">
-                Explore guides <ArrowRight className="size-4" />
-              </Link>
+              <a href="#request-guide">
+                Request your personal guide <ArrowRight className="size-4" />
+              </a>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a href="#categories">Browse categories</a>
+              <Link to="/guides">Explore guides</Link>
             </Button>
           </div>
           <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-6">
@@ -64,7 +66,7 @@ function Home() {
         <div className="relative">
           <img
             src="/covers/hero-lineup.jpg"
-            alt="A lineup of Fieldnote guidebooks on a wooden table"
+            alt="A lineup of Cairn guides on a wooden table"
             className="w-full rounded-[28px] object-cover shadow-card"
             width={720}
             height={540}
@@ -72,11 +74,43 @@ function Home() {
         </div>
       </section>
 
+      {/* Request personal guide — moved higher, reuses existing WaitlistSection */}
+      <div id="request-guide">
+        <WaitlistSection />
+      </div>
+
+      {/* Pricing options */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <p className="text-xs tracking-[0.22em] text-accent uppercase">How it works</p>
+        <h2 className="mt-2 font-display text-3xl tracking-tight">Two ways to get a guide</h2>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-[22px] border border-line bg-paper px-6 py-8">
+            <p className="text-xs tracking-[0.16em] text-accent uppercase">Ready-made</p>
+            <h3 className="mt-2 font-display text-2xl">Pay once, yours forever</h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Choose one of the existing guides. Instant download after payment. Keep it on your phone or laptop.
+            </p>
+          </div>
+          <div className="rounded-[22px] border border-line bg-paper px-6 py-8">
+            <p className="text-xs tracking-[0.16em] text-accent uppercase">Made for you</p>
+            <h3 className="mt-2 font-display text-2xl">Personal guide with check-ins</h3>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Tell us your exact situation. We write a focused guide and stay available for follow-up questions.
+            </p>
+            <p className="mt-4 text-sm font-medium text-ink">Price: to be confirmed</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured existing guides as quality examples */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs tracking-[0.22em] text-accent uppercase">Featured</p>
-            <h2 className="mt-2 font-display text-3xl tracking-tight">Guides worth reading</h2>
+            <p className="text-xs tracking-[0.22em] text-accent uppercase">Examples</p>
+            <h2 className="mt-2 font-display text-3xl tracking-tight">Guides already written</h2>
+            <p className="mt-2 max-w-xl text-sm text-muted">
+              These show the quality and tone of a Cairn guide. Pay once — yours forever.
+            </p>
           </div>
           <Link
             to="/guides"
@@ -121,7 +155,7 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">Why Fieldnote</p>
+        <p className="text-xs tracking-[0.22em] text-accent uppercase">Why Cairn</p>
         <h2 className="mt-2 max-w-xl font-display text-3xl tracking-tight">
           Written for ordinary days, not perfect ones
         </h2>
@@ -156,8 +190,6 @@ function Home() {
           ))}
         </div>
       </section>
-
-      <WaitlistSection />
 
       <section className="mx-auto max-w-3xl px-4 pb-20 sm:px-6">
         <p className="text-xs tracking-[0.22em] text-accent uppercase">FAQ</p>

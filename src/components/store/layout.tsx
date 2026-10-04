@@ -29,7 +29,7 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
               {settings.storeName}
             </span>
             <span className="mt-1 text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">
-              Notes for real life
+              Small steps, clearly marked
             </span>
           </span>
         </Link>
@@ -196,7 +196,7 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
       <div className="border-t border-line/80">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-muted sm:px-6">
           <p>
-            © {year} {settings.storeName}. Digital guides for everyday life.
+            © {year} {settings.storeName}. Small steps, clearly marked.
           </p>
           <UserButton />
         </div>

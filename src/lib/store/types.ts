@@ -106,9 +106,9 @@ export type OrderRow = {
 };
 
 export const DEFAULT_SETTINGS: StoreSettings = {
-  storeName: "Fieldnote",
-  tagline: "Practical Guides for Real Life",
-  supportEmail: "hello@fieldnote.store",
+  storeName: "Cairn",
+  tagline: "Small steps, clearly marked.",
+  supportEmail: "hello@cairn.guide",
   contactPhone: "",
   whatsapp: "",
   currency: "NGN",

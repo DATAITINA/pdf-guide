@@ -27,7 +27,7 @@ function AdminLayout() {
       <aside className="border-b border-line md:border-r md:border-b-0">
         <div className="flex items-center justify-between px-4 py-4 md:block">
           <Link to="/" className="font-display text-xl">
-            Fieldnote
+            Cairn
           </Link>
           <p className="hidden text-xs text-muted md:mt-1 md:block">Publisher</p>
           <div className="md:mt-6">

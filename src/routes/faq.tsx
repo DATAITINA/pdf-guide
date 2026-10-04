@@ -6,7 +6,7 @@ export const Route = createFileRoute("/faq")({
   loader: () => getStorefront(),
   component: FaqPage,
   head: ({ loaderData }) => ({
-    meta: [{ title: `FAQ — ${loaderData?.settings.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `FAQ — ${loaderData?.settings.storeName ?? "Cairn"}` }],
   }),
 });
 

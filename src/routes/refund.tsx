@@ -6,7 +6,7 @@ export const Route = createFileRoute("/refund")({
   loader: () => getSiteSettings(),
   component: Refund,
   head: ({ loaderData }) => ({
-    meta: [{ title: `Refund policy — ${loaderData?.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `Refund policy — ${loaderData?.storeName ?? "Cairn"}` }],
   }),
 });
 

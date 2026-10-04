@@ -6,7 +6,7 @@ export const Route = createFileRoute("/contact")({
   loader: () => getSiteSettings(),
   component: Contact,
   head: ({ loaderData }) => ({
-    meta: [{ title: `Contact — ${loaderData?.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `Contact — ${loaderData?.storeName ?? "Cairn"}` }],
   }),
 });
 
