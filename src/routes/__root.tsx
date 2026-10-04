@@ -4,7 +4,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Fieldnote";
+const APP_NAME = "Cairn";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -16,11 +16,11 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Practical digital guides designed to help you navigate parenting, relationships, money, business, career and everyday life.",
+          "Tell us your problem. Get a practical guide made for you. Clear digital guides for everyday life.",
       },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg?v=fieldnote-20261003" },
+      { rel: "icon", type: "image/svg+xml", href: "/fieldnote-mark.svg" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
