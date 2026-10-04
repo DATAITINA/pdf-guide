@@ -97,7 +97,9 @@ function Home() {
             <p className="mt-3 text-sm leading-relaxed text-muted">
               Tell us your situation. We write a focused guide and stay available for follow-up questions on WhatsApp.
             </p>
-            <p className="mt-4 text-sm font-medium text-ink">[YOUR PRICE HERE]</p>
+            <p className="mt-4 text-sm font-medium text-ink">
+              Price depends on your situation. We'll confirm it on WhatsApp before you pay.
+            </p>
             <a href="#request-guide" className="mt-5 inline-block text-sm font-medium text-accent hover:underline">
               Request yours →
             </a>
