@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
@@ -36,7 +35,7 @@ export function normalizeTopicName(raw: string): string {
 }
 
 export function generateVoucherCode(): string {
-  const bytes = randomBytes(8);
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(8));
   let out = "";
   for (let i = 0; i < 8; i++) {
     out += VOUCHER_ALPHABET[bytes[i]! % VOUCHER_ALPHABET.length];
