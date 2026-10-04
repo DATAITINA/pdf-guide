@@ -6,7 +6,7 @@ export const Route = createFileRoute("/terms")({
   loader: () => getSiteSettings(),
   component: Terms,
   head: ({ loaderData }) => ({
-    meta: [{ title: `Terms — ${loaderData?.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `Terms — ${loaderData?.storeName ?? "Cairn"}` }],
   }),
 });
 
