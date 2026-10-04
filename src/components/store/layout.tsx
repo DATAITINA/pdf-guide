@@ -20,10 +20,10 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
         <Link
           to="/"
           aria-label={`${settings.storeName} home`}
-          className="flex min-w-0 items-center gap-2.5"
+          className="flex min-w-0 items-center gap-3"
           onClick={() => setOpen(false)}
         >
-          <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
+          <img src="/cairn-mark.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
           <span className="flex min-w-0 flex-col leading-none">
             <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">
               {settings.storeName}
@@ -129,7 +129,7 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
-            <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
+            <img src="/cairn-mark.svg" alt="" aria-hidden="true" width={32} height={32} className="size-8 shrink-0" />
             <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
           </div>
           <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">{settings.tagline}</p>

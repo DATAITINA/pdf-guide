@@ -72,7 +72,7 @@ function Home() {
         <div className="mx-auto max-w-6xl px-4 pt-8 pb-12 sm:px-6 sm:pt-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pt-20 lg:pb-20">
           <div className="rise-in">
             <p className="eyebrow flex items-center gap-2">
-              <CairnStones className="size-5" />
+              <CairnStones className="size-4" />
               Personal and ready-made guides
             </p>
             <h1 className="mt-4 max-w-xl font-display text-[2.125rem] leading-[1.1] text-ink sm:text-[3.25rem]">
@@ -218,7 +218,7 @@ function Home() {
         <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {WHY_CAIRN.map(([title, copy]) => (
             <li key={title} className="flex gap-4">
-              <CairnStones className="mt-0.5 size-7 shrink-0 text-accent/70" />
+              <CairnStones className="mt-1 size-5 shrink-0 text-accent/70" />
               <div>
                 <p className="text-lg font-medium text-ink">{title}</p>
                 <p className="mt-1 text-base leading-relaxed text-muted">{copy}</p>
