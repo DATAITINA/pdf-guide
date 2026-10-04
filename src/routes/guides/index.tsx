@@ -26,7 +26,7 @@ export const Route = createFileRoute("/guides/")({
   component: Catalogue,
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Guides — ${loaderData?.settings.storeName ?? "Fieldnote"}` },
+      { title: `Guides — ${loaderData?.settings.storeName ?? "Cairn"}` },
       {
         name: "description",
         content: "Browse practical digital PDF guides for parenting, money, work, and everyday life.",
