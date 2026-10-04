@@ -10,7 +10,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         await ensureSeeded();
         const sql = await getSql();
         const products = await sql<{ slug: string }>`
-          select slug from products where published = true and archived = false`;
+          select slug from products where published = true and archived = false and is_placeholder = false`;
         const origin = env("APP_URL") || new URL(request.url).origin;
         const staticPaths = ["/", "/guides", "/about", "/contact", "/faq", "/refund", "/privacy", "/terms"];
         const urls = [

@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { getStorefront } from "@/lib/store/catalog";
+import { formatMoney } from "@/lib/store/money";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
 import { WaitlistSection } from "@/components/store/waitlist-section";
+import { CairnStones, TrailLine } from "@/components/store/cairn-art";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -15,249 +18,282 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Tell us your problem. Get a practical guide made for you. Ready-made PDFs or a personal guide with check-ins — delivered on WhatsApp.",
+          "Tell us your problem. Get a practical guide made for you. Ready-made PDFs or a personal guide with check-ins on WhatsApp.",
       },
     ],
   }),
 });
 
+/** Homepage-only answers about the personal guide, shown above the store FAQs. */
+const PERSONAL_GUIDE_FAQS = [
+  {
+    id: "home-personal-guide",
+    question: "What is a personal guide?",
+    answer:
+      "A short, practical guide written for your situation, not a general one. You tell us what’s going on, we ask a few questions on WhatsApp, then we write clear steps you can follow at home or at work.",
+  },
+  {
+    id: "home-pricing",
+    question: "How much does a personal guide cost?",
+    answer:
+      "It depends on your situation and how much help you need. We’ll tell you the price on WhatsApp before you pay anything, and you decide from there. Ready-made guides show their price on each guide’s page.",
+  },
+  {
+    id: "home-check-ins",
+    question: "How do check-ins work?",
+    answer:
+      "After you get your guide, we message you on WhatsApp to see how it’s going. If something isn’t working, we talk it through and adjust the guide with you.",
+  },
+];
+
+const WHY_CAIRN = [
+  ["Plain language", "Short steps and real examples from home and work life. No jargon."],
+  ["Use it the same day", "Practical things to try, not theory to admire."],
+  ["Ready-made or personal", "Buy a guide that’s already written, or ask for one written for you."],
+  ["On WhatsApp", "Personal guides and check-ins come where you already chat."],
+] as const;
+
 function Home() {
   const data = Route.useLoaderData();
-  const featured = data.featured.length ? data.featured : data.products.slice(0, 4);
+  const realProducts = data.products.filter((p) => !p.isPlaceholder);
+  const examples = realProducts.slice(0, 4);
+  const lowestPrice = realProducts.length ? Math.min(...realProducts.map((p) => p.priceKobo)) : null;
   const waDigits = (data.settings.whatsapp || "").replace(/\D/g, "");
   const waLink = waDigits ? `https://wa.me/${waDigits}` : null;
+  const showSticky = useStickyBarVisibility();
+  const realTestimonials = data.testimonials.filter((t) => !t.isPlaceholder);
+  const faqs = [...PERSONAL_GUIDE_FAQS, ...data.faqs];
 
   return (
     <PageShell settings={data.settings}>
-      {/* Hero — one idea above the fold on a phone */}
-      <section className="mx-auto max-w-6xl px-4 pt-8 pb-6 sm:px-6 sm:pt-12 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14 lg:pt-16">
-        <div>
-          <p className="text-xs font-medium tracking-[0.22em] text-accent uppercase">Cairn</p>
-          <h1 className="mt-3 max-w-xl font-display text-[2.35rem] leading-[1.08] text-ink sm:text-[3.25rem]">
-            Tell us your problem. Get a guide made for you.
-          </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-            Practical guides for home and work. Ready-made PDFs, or a personal guide with check-ins — sent on WhatsApp.
-          </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg" className="w-full sm:w-auto">
-              <a href="#request-guide">
-                Request your personal guide <ArrowRight className="size-4" />
-              </a>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-              <Link to="/guides">Explore ready-made guides</Link>
-            </Button>
-          </div>
-          {waLink ? (
-            <p className="mt-4 text-sm text-muted">
-              Prefer to talk first?{" "}
-              <a href={waLink} className="font-medium text-accent hover:underline" target="_blank" rel="noopener noreferrer">
-                Chat on WhatsApp
-              </a>
+      {/* Hero: label, headline, one sentence, one button, one quiet link */}
+      <section className="relative overflow-hidden">
+        <TrailLine className="absolute -right-24 bottom-6 hidden w-[520px] text-accent/20 lg:block" />
+        <div className="mx-auto max-w-6xl px-4 pt-8 pb-12 sm:px-6 sm:pt-14 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pt-20 lg:pb-20">
+          <div className="rise-in">
+            <p className="eyebrow flex items-center gap-2">
+              <CairnStones className="size-5" />
+              Personal and ready-made guides
             </p>
-          ) : null}
-        </div>
-        <div className="relative mt-10 lg:mt-0">
-          <img
-            src="/covers/hero-lineup.jpg"
-            alt="Cairn guides laid out on a wooden table"
-            className="w-full rounded-[28px] object-cover shadow-card"
-            width={720}
-            height={540}
-            loading="eager"
-            decoding="async"
-          />
+            <h1 className="mt-4 max-w-xl font-display text-[2.125rem] leading-[1.1] text-ink sm:text-[3.25rem]">
+              Tell us your problem. Get a guide made for you.
+            </h1>
+            <p className="mt-4 max-w-lg text-[1.0625rem] leading-relaxed text-muted sm:text-lg">
+              Plain, practical help for home and work, written for your situation, with check-ins on WhatsApp.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6" data-sticky-hide>
+              <Button asChild size="lg" className="w-full sm:w-auto">
+                <a href="#request-guide">
+                  Tell us what you need <ArrowRight className="size-4" aria-hidden />
+                </a>
+              </Button>
+              <Link
+                to="/guides"
+                className="link inline-flex min-h-12 items-center justify-center text-base sm:justify-start"
+              >
+                Or browse ready-made guides
+              </Link>
+            </div>
+          </div>
+          <div className="mt-10 lg:mt-0">
+            <img
+              src="/covers/hero-lineup.jpg"
+              srcSet="/covers/hero-lineup-720.jpg 720w, /covers/hero-lineup.jpg 1440w"
+              sizes="(min-width: 1024px) 520px, 100vw"
+              alt="Printed Cairn guides laid out on a wooden table"
+              className="aspect-[16/10] w-full rounded-[24px] object-cover shadow-card lg:aspect-[4/3] lg:rounded-[28px]"
+              width={1440}
+              height={810}
+              decoding="async"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Request personal guide */}
-      <div id="request-guide">
+      {/* Request form */}
+      <div id="request-guide" className="scroll-mt-16 border-y border-line bg-paper-2/50" data-sticky-hide>
         <WaitlistSection whatsappLink={waLink} />
       </div>
 
       {/* Two options */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">Options</p>
-        <h2 className="mt-2 font-display text-3xl tracking-tight">Two ways to get a guide</h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-2">
-          <div className="rounded-[22px] border border-line bg-paper px-6 py-8">
-            <p className="text-xs tracking-[0.16em] text-accent uppercase">Ready-made</p>
-            <h3 className="mt-2 font-display text-2xl">Pay once, yours forever</h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Pick a guide that already exists. Pay once, download the PDF, keep it on your phone.
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <p className="eyebrow">Two options</p>
+        <h2 className="mt-3 font-display text-[2rem] leading-tight sm:text-[2.5rem]">Two ways to get a guide</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
+          <div className="flex flex-col rounded-[24px] border border-line bg-surface p-6 sm:p-8">
+            <p className="eyebrow">Made for you</p>
+            <h3 className="mt-3 font-display text-2xl">A personal guide, with check-ins</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted">
+              Tell us your situation. We write a guide for it, then message you on WhatsApp to see how it’s going and
+              adjust it with you.
             </p>
-            <Link to="/guides" className="mt-5 inline-block text-sm font-medium text-accent hover:underline">
-              Browse guides →
-            </Link>
-          </div>
-          <div className="rounded-[22px] border border-line bg-paper px-6 py-8">
-            <p className="text-xs tracking-[0.16em] text-accent uppercase">Made for you</p>
-            <h3 className="mt-2 font-display text-2xl">Personal guide with check-ins</h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Tell us your situation. We write a focused guide and stay available for follow-up questions on WhatsApp.
+            <p className="mt-4 rounded-[14px] bg-paper-2/70 px-4 py-3 text-base font-medium text-ink">
+              Price depends on your situation. We'll confirm it on WhatsApp before you pay.
             </p>
-            <p className="mt-4 text-sm font-medium text-ink">[YOUR PRICE HERE]</p>
-            <a href="#request-guide" className="mt-5 inline-block text-sm font-medium text-accent hover:underline">
-              Request yours →
+            <a href="#request-guide" className="link mt-6 inline-flex min-h-12 items-center gap-2 self-start text-base">
+              Tell us what you need <ArrowRight className="size-4" aria-hidden />
             </a>
           </div>
-        </div>
-      </section>
-
-      {/* Example guides */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs tracking-[0.22em] text-accent uppercase">Examples</p>
-            <h2 className="mt-2 font-display text-3xl tracking-tight">Guides already written</h2>
-            <p className="mt-2 max-w-xl text-sm text-muted">
-              These show the quality and tone. Pay once — yours forever.
+          <div className="flex flex-col rounded-[24px] border border-line bg-surface p-6 sm:p-8">
+            <p className="eyebrow">Ready-made</p>
+            <h3 className="mt-3 font-display text-2xl">A guide that’s already written</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted">
+              Pick a PDF guide, pay, and download it to keep on your phone.
             </p>
+            {lowestPrice !== null ? (
+              <p className="mt-4 rounded-[14px] bg-paper-2/70 px-4 py-3 text-base font-medium text-ink tabular-nums">
+                From {formatMoney(lowestPrice, realProducts[0]!.currency)}
+              </p>
+            ) : null}
+            <Link to="/guides" className="link mt-6 inline-flex min-h-12 items-center gap-2 self-start text-base">
+              Browse ready-made guides <ArrowRight className="size-4" aria-hidden />
+            </Link>
           </div>
-          <Link
-            to="/guides"
-            className="hidden text-sm font-medium text-accent transition-colors hover:text-accent-hover sm:inline"
-          >
-            View all
-          </Link>
-        </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-        <div className="mt-8 sm:hidden">
-          <Button asChild variant="outline" className="w-full">
-            <Link to="/guides">View all guides</Link>
-          </Button>
         </div>
       </section>
 
-      <section id="categories" className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <p className="text-xs tracking-[0.22em] text-accent uppercase">Categories</p>
-          <h2 className="mt-2 font-display text-3xl tracking-tight">Find a guide by the life it helps</h2>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {data.categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to="/guides"
-                search={{ category: cat.slug }}
-                className="group rounded-[20px] border border-line bg-paper px-5 py-5 transition-all duration-200 hover:border-accent/35"
-              >
-                <p className="font-medium text-ink transition-colors group-hover:text-accent">{cat.name}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{cat.description}</p>
-              </Link>
+      {/* Example guides: real products only */}
+      {examples.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Examples</p>
+              <h2 className="mt-3 font-display text-[2rem] leading-tight sm:text-[2.5rem]">Guides already written</h2>
+              <p className="mt-3 max-w-xl text-base text-muted">A look at the tone and detail you can expect.</p>
+            </div>
+            <Link to="/guides" className="link hidden min-h-12 items-center text-base sm:inline-flex">
+              See all guides
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+            {examples.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Why Cairn — covers both options */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">Why Cairn</p>
-        <h2 className="mt-2 max-w-xl font-display text-3xl tracking-tight">
-          Written for ordinary days, not perfect ones
-        </h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Plain language", "Short scripts and examples from real home and work life."],
-            ["Use it the same day", "Practical steps, not theory to admire."],
-            ["Ready-made or personal", "Buy an existing PDF, or request a guide written for your situation."],
-            ["On WhatsApp", "Personal guides and check-ins arrive where you already chat."],
-          ].map(([title, copy]) => (
-            <div key={title} className="rounded-[18px] bg-paper-2/80 px-5 py-5">
-              <p className="font-medium">{title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{copy}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How it works — both paths */}
-      <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
-        <div className="grid gap-8 rounded-[28px] bg-accent px-6 py-10 text-accent-fg sm:px-10 md:grid-cols-3 md:gap-6">
-          {[
-            [
-              "1. Tell us what you need",
-              "Request a personal guide, or pick a ready-made title from the catalogue.",
-            ],
-            [
-              "2. Pay once",
-              "Checkout with Paystack or bank transfer. Personal guides are priced separately.",
-            ],
-            [
-              "3. Get your guide",
-              "Ready-made PDFs download instantly. Personal guides arrive on WhatsApp with check-ins.",
-            ],
-          ].map(([title, copy], i) => (
-            <div key={title}>
-              <p className="text-[11px] tracking-[0.18em] uppercase opacity-70">Step {i + 1}</p>
-              <p className="mt-2 font-display text-2xl tracking-tight">{title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-accent-fg/85">{copy}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Real quotes only — empty until you provide them */}
-      {data.testimonials.filter((t) => !t.isPlaceholder).length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <p className="text-xs tracking-[0.22em] text-accent uppercase">From readers</p>
-          <h2 className="mt-2 font-display text-3xl tracking-tight">What people say</h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {data.testimonials
-              .filter((t) => !t.isPlaceholder)
-              .map((t) => (
-                <blockquote key={t.id} className="rounded-[22px] border border-line bg-surface px-5 py-5">
-                  <p className="font-display text-xl leading-snug">{t.quote}</p>
-                  <footer className="mt-4 text-sm text-muted">{t.attribution}</footer>
-                </blockquote>
-              ))}
+          <div className="mt-8 sm:hidden">
+            <Button asChild variant="outline" size="lg" className="w-full">
+              <Link to="/guides">See all guides</Link>
+            </Button>
           </div>
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-3xl px-4 pb-24 sm:px-6 sm:pb-20">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">FAQ</p>
-        <h2 className="mt-2 font-display text-3xl tracking-tight">Before you start</h2>
-        <p className="mt-2 text-sm text-muted">
-          Answers for ready-made guides and personal guides with check-ins.
-        </p>
+      {/* How it works: a short trail of three stones */}
+      <section className="bg-accent text-accent-fg">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <p className="text-[0.8125rem] font-semibold tracking-[0.16em] text-accent-fg/80 uppercase">
+            How it works
+          </p>
+          <h2 className="mt-3 font-display text-[2rem] leading-tight sm:text-[2.5rem]">Three simple steps</h2>
+          <ol className="relative mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+            <span
+              aria-hidden
+              className="absolute top-6 bottom-6 left-6 border-l-2 border-dotted border-accent-fg/30 md:top-6 md:right-[16%] md:bottom-auto md:left-[16%] md:border-t-2 md:border-l-0"
+            />
+            <Step n={1} title="Tell us what you need">
+              Fill in the short form, or pick a ready-made guide.
+            </Step>
+            <Step n={2} title="Agree the price, or pay">
+              <span className="block">
+                <span className="font-medium text-accent-fg">Personal guide:</span> We agree the price on WhatsApp.
+              </span>
+              <span className="mt-2 block">
+                <span className="font-medium text-accent-fg">Ready-made:</span> Pay with transfer.
+              </span>
+            </Step>
+            <Step n={3} title="Get your guide">
+              Personal guides come on WhatsApp, and we check in to see how it’s going. Ready-made guides come as a
+              download link once your payment is confirmed.
+            </Step>
+          </ol>
+        </div>
+      </section>
+
+      {/* Why Cairn */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <p className="eyebrow">Why Cairn</p>
+        <h2 className="mt-3 max-w-xl font-display text-[2rem] leading-tight sm:text-[2.5rem]">
+          Written for ordinary days, not perfect ones
+        </h2>
+        <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          {WHY_CAIRN.map(([title, copy]) => (
+            <li key={title} className="flex gap-4">
+              <CairnStones className="mt-0.5 size-7 shrink-0 text-accent/70" />
+              <div>
+                <p className="text-lg font-medium text-ink">{title}</p>
+                <p className="mt-1 text-base leading-relaxed text-muted">{copy}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Real quotes only: empty until the owner adds them */}
+      {realTestimonials.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
+          <p className="eyebrow">From readers</p>
+          <h2 className="mt-3 font-display text-[2rem] leading-tight sm:text-[2.5rem]">What people say</h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {realTestimonials.map((t) => (
+              <blockquote key={t.id} className="rounded-[24px] border border-line bg-surface p-6">
+                <p className="font-display text-xl leading-snug">{t.quote}</p>
+                <footer className="mt-4 text-base text-muted">{t.attribution}</footer>
+              </blockquote>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* FAQ */}
+      <section className="mx-auto max-w-3xl px-4 pb-8 sm:px-6">
+        <p className="eyebrow">Questions</p>
+        <h2 className="mt-3 font-display text-[2rem] leading-tight sm:text-[2.5rem]">Before you start</h2>
         <div className="mt-8 divide-y divide-line border-y border-line">
-          {data.faqs.map((faq) => (
-            <details key={faq.id} className="group py-4">
-              <summary className="cursor-pointer list-none font-medium after:float-right after:text-subtle after:content-['+'] group-open:after:content-['–']">
+          {faqs.map((faq) => (
+            <details key={faq.id} className="group">
+              <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-4 text-lg font-medium text-ink">
                 {faq.question}
+                <span
+                  aria-hidden
+                  className="grid size-8 shrink-0 place-items-center rounded-full bg-paper-2 text-accent transition-transform duration-200 group-open:rotate-45"
+                >
+                  +
+                </span>
               </summary>
-              <p className="mt-2 pr-8 text-sm leading-relaxed text-muted">{faq.answer}</p>
+              <p className="pr-12 pb-5 text-base leading-relaxed text-muted">{faq.answer}</p>
             </details>
           ))}
         </div>
-        <p className="mt-6 text-center text-sm text-muted">
+        <p className="mt-8 text-center text-base text-muted">
           Still unsure?{" "}
           {waLink ? (
-            <a href={waLink} className="font-medium text-accent hover:underline" target="_blank" rel="noopener noreferrer">
+            <a href={waLink} className="link" target="_blank" rel="noopener noreferrer">
               Chat on WhatsApp
             </a>
           ) : (
-            <Link to="/contact" className="font-medium text-accent hover:underline">
-              Send a message
+            <Link to="/contact" className="link">
+              Send us a message
             </Link>
           )}
         </p>
       </section>
 
-      {/* Sticky mobile CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 p-3 backdrop-blur-md sm:hidden">
+      {/* Sticky mobile button: hidden while the hero button, the form or the footer is on screen */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 p-3 backdrop-blur-md transition-transform duration-200 sm:hidden ${
+          showSticky ? "translate-y-0" : "pointer-events-none translate-y-full"
+        }`}
+        aria-hidden={!showSticky}
+      >
         <div className="mx-auto flex max-w-lg gap-2">
-          <Button asChild size="lg" className="min-h-12 flex-1">
-            <a href="#request-guide">Request your guide</a>
+          <Button asChild size="lg" className="flex-1">
+            <a href="#request-guide" tabIndex={showSticky ? undefined : -1}>
+              Tell us what you need
+            </a>
           </Button>
           {waLink ? (
-            <Button asChild variant="outline" size="lg" className="min-h-12 shrink-0 px-3" aria-label="Chat on WhatsApp">
-              <a href={waLink} target="_blank" rel="noopener noreferrer">
+            <Button asChild variant="outline" size="lg" className="shrink-0 px-3" aria-label="Chat on WhatsApp">
+              <a href={waLink} target="_blank" rel="noopener noreferrer" tabIndex={showSticky ? undefined : -1}>
                 <MessageCircle className="size-5" />
               </a>
             </Button>
@@ -266,4 +302,40 @@ function Home() {
       </div>
     </PageShell>
   );
+}
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <li className="relative flex gap-5 md:flex-col md:gap-4">
+      <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-[45%_55%_50%_50%/55%_50%_50%_45%] bg-accent-fg font-display text-xl text-accent">
+        {n}
+      </span>
+      <div>
+        <p className="font-display text-2xl">{title}</p>
+        <p className="mt-2 text-base leading-relaxed text-accent-fg/85">{children}</p>
+      </div>
+    </li>
+  );
+}
+
+/** True when none of the [data-sticky-hide] blocks are on screen. */
+function useStickyBarVisibility() {
+  const [visible, setVisible] = useState(false);
+  const onScreen = useRef(new Set<Element>());
+
+  useEffect(() => {
+    const targets = document.querySelectorAll("[data-sticky-hide]");
+    if (!("IntersectionObserver" in window) || targets.length === 0) return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) onScreen.current.add(entry.target);
+        else onScreen.current.delete(entry.target);
+      }
+      setVisible(onScreen.current.size === 0);
+    });
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  return visible;
 }

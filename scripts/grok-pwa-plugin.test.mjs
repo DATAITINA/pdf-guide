@@ -449,14 +449,14 @@ test("strips install params from the app link", () => {
 });
 
 test("names the install page from host slug", () => {
-  assert.equal(appNameFromHost("localhost:8080"), "Fieldnote");
-  assert.equal(appNameFromHost("172.17.154.217:8080"), "Fieldnote");
+  assert.equal(appNameFromHost("localhost:8080"), "Cairn");
+  assert.equal(appNameFromHost("172.17.154.217:8080"), "Cairn");
   assert.equal(appNameFromHost("wild-race.grok.me"), "Wild Race");
 });
 
 test("rejects hosts that are not plain slugs", () => {
-  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Fieldnote");
-  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Fieldnote");
+  assert.equal(appNameFromHost("<script>alert(1)</script>"), "Cairn");
+  assert.equal(appNameFromHost('"><img src=x onerror=1>.grok.me'), "Cairn");
 });
 
 test("renders install page markup", () => {
@@ -489,10 +489,10 @@ test("renders the manifest with the per-app name", () => {
   assert.equal(manifest.background_color, "#F8F4E9");
 });
 
-test("uses the Fieldnote app name for non-grok production hosts", () => {
-  const manifest = JSON.parse(renderWebManifest("usefieldnote.vercel.app"));
-  assert.equal(manifest.name, "Fieldnote");
-  assert.equal(manifest.short_name, "Fieldnote");
+test("uses the Cairn app name for non-grok production hosts", () => {
+  const manifest = JSON.parse(renderWebManifest("trycairn.vercel.app"));
+  assert.equal(manifest.name, "Cairn");
+  assert.equal(manifest.short_name, "Cairn");
 });
 
 // Tripwires: the deployed-app path only works if Nitro scans server/ — an

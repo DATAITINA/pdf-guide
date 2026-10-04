@@ -23,7 +23,7 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
           className="flex min-w-0 items-center gap-2.5"
           onClick={() => setOpen(false)}
         >
-          <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
+          <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
           <span className="flex min-w-0 flex-col leading-none">
             <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">
               {settings.storeName}
@@ -64,14 +64,14 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
         <div className="flex items-center gap-2 md:hidden">
           <Link
             to="/guides"
-            className="rounded-[10px] p-2 text-ink transition-colors hover:bg-paper-2"
+            className="grid size-12 place-items-center rounded-[12px] text-ink transition-colors hover:bg-paper-2"
             aria-label="Search guides"
           >
             <Search className="size-5" />
           </Link>
           <button
             type="button"
-            className="rounded-[10px] p-2 text-ink transition-colors hover:bg-paper-2"
+            className="grid size-12 place-items-center rounded-[12px] text-ink transition-colors hover:bg-paper-2"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -125,68 +125,68 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
 export function StoreFooter({ settings }: { settings: StoreSettings }) {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-20 border-t border-line bg-paper-2/60">
+    <footer className="mt-20 border-t border-line bg-paper-2/60" data-sticky-hide>
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
-            <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
+            <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
             <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
           </div>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{settings.tagline}</p>
-          <p className="mt-4 text-sm text-muted">
+          <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">{settings.tagline}</p>
+          <p className="mt-4 max-w-sm text-base leading-relaxed text-muted">
             Practical digital guides you can download and keep — written for ordinary days, not perfect ones.
           </p>
         </div>
         <div>
-          <p className="text-xs tracking-[0.16em] text-subtle uppercase">Explore</p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <p className="text-[0.8125rem] font-semibold tracking-[0.16em] text-subtle uppercase">Explore</p>
+          <ul className="mt-3 space-y-1 text-base">
             <li>
-              <Link to="/" className="transition-colors hover:text-accent">
+              <Link to="/" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/guides" className="transition-colors hover:text-accent">
+              <Link to="/guides" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 All guides
               </Link>
             </li>
             <li>
-              <Link to="/about" className="transition-colors hover:text-accent">
+              <Link to="/about" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 About
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="transition-colors hover:text-accent">
+              <Link to="/contact" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Contact
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="transition-colors hover:text-accent">
+              <Link to="/faq" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 FAQ
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <p className="text-xs tracking-[0.16em] text-subtle uppercase">Policies</p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <p className="text-[0.8125rem] font-semibold tracking-[0.16em] text-subtle uppercase">Policies</p>
+          <ul className="mt-3 space-y-1 text-base">
             <li>
-              <Link to="/refund" className="transition-colors hover:text-accent">
+              <Link to="/refund" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Refund policy
               </Link>
             </li>
             <li>
-              <Link to="/privacy" className="transition-colors hover:text-accent">
+              <Link to="/privacy" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Privacy policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="transition-colors hover:text-accent">
+              <Link to="/terms" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Terms
               </Link>
             </li>
             <li>
-              <Link to="/admin" className="transition-colors hover:text-accent">
+              <Link to="/admin" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
                 Publisher
               </Link>
             </li>

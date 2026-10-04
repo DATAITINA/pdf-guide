@@ -68,6 +68,7 @@ const LOCAL_DEV_ORIGINS: string[] = [
 const PRODUCTION_ORIGINS: string[] = [
   "https://usefieldnote.vercel.app",
   "https://fieldnotepdf.vercel.app",
+  "https://trycairn.vercel.app",
 ];
 
 const baseURL = explicitBaseURL ?? {

@@ -25,3 +25,17 @@ export const PRESET_TOPICS = [
 ] as const;
 
 export const VOUCHER_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+/** Longest “What do you need help with?” answer we accept. */
+export const REQUEST_MAX_LENGTH = 200;
+
+/**
+ * Turn a Nigerian mobile number into +234XXXXXXXXXX, or null if it isn't one.
+ * Accepts 0803 123 4567, 08031234567, +2348031234567, 2348031234567 and
+ * +234 0803… (spaces, dashes, dots and brackets are ignored).
+ */
+export function normalizeNigerianWhatsapp(raw: string): string | null {
+  const compact = raw.replace(/[\s\-().]/g, "");
+  const match = /^(?:0|\+?2340?)([789][01]\d{8})$/.exec(compact);
+  return match ? `+234${match[1]}` : null;
+}

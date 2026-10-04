@@ -1,4 +1,4 @@
--- Fieldnote digital PDF store
+-- Cairn digital PDF store
 create table if not exists categories (
   id text primary key,
   name text not null,

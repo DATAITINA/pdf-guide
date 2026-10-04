@@ -65,26 +65,19 @@ export async function sendPurchaseEmail(input: {
   return sendResend({ to: input.to, subject: "Your PDF Guide Is Ready", html });
 }
 
-export async function sendWaitlistConfirmEmail(input: {
-  to: string;
-  topicName: string;
-  code: string;
-  position: number;
-}): Promise<boolean> {
+export async function sendWaitlistConfirmEmail(input: { to: string; topicName: string }): Promise<boolean> {
   const html = wrapEmail(
     [
-      `<p style="margin:0 0 8px;letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#1A4D47;">Fieldnote</p>`,
-      "<h1 style=\"margin:0 0 16px;font-size:26px;line-height:1.25;\">You're on the list</h1>",
-      `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;">Thanks for requesting <strong>${escapeHtml(input.topicName)}</strong>.</p>`,
-      `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;">You're <strong>#${input.position}</strong> for this topic. When the guide launches, your voucher activates for ₦1,500 instead of ₦2,000.</p>`,
-      `<p style="margin:0 0 8px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#5c574f;">Your code</p>`,
-      `<p style="margin:0 0 16px;font-size:22px;letter-spacing:.08em;font-family:ui-monospace,monospace;">${escapeHtml(input.code)}</p>`,
-      `<p style="margin:0;font-size:14px;line-height:1.55;color:#5c574f;">This code stays reserved until the guide is published. We'll email you the moment it's live.</p>`,
+      `<p style="margin:0 0 8px;letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#1A4D47;">Cairn</p>`,
+      "<h1 style=\"margin:0 0 16px;font-size:26px;line-height:1.25;\">We got your request</h1>",
+      `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;">Thanks for telling us what you need help with:</p>`,
+      `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;"><strong>${escapeHtml(input.topicName)}</strong></p>`,
+      `<p style="margin:0;font-size:16px;line-height:1.55;">We'll reply on WhatsApp to talk it through and agree the price before you pay anything.</p>`,
     ].join(""),
   );
   return sendResend({
     to: input.to,
-    subject: `You're on the list — ${input.topicName}`,
+    subject: "We got your request",
     html,
   });
 }
@@ -99,7 +92,7 @@ export async function sendWaitlistLaunchEmail(input: {
 }): Promise<boolean> {
   const html = wrapEmail(
     [
-      `<p style="margin:0 0 8px;letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#1A4D47;">Fieldnote</p>`,
+      `<p style="margin:0 0 8px;letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#1A4D47;">Cairn</p>`,
       "<h1 style=\"margin:0 0 16px;font-size:26px;line-height:1.25;\">Your guide is live</h1>",
       `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;"><strong>${escapeHtml(input.productTitle)}</strong> is ready — the topic you asked for.</p>`,
       `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;">Use code <strong>${escapeHtml(input.code)}</strong> at checkout for ₦500 off. It expires in ${input.expiresInDays} days.</p>`,
