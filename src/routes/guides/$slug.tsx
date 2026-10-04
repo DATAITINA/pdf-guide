@@ -19,7 +19,7 @@ export const Route = createFileRoute("/guides/$slug")({
     const description = product?.seoDescription || product?.shortDescription || "";
     return {
       meta: [
-        { title: `${title} — ${loaderData?.settings.storeName ?? "Fieldnote"}` },
+        { title: `${title} — ${loaderData?.settings.storeName ?? "Cairn"}` },
         { name: "description", content: description },
         { name: "og:title", content: title },
         { name: "og:description", content: description },
