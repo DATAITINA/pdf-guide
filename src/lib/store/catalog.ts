@@ -94,10 +94,16 @@ export const listCatalogue = createServerFn({ method: "GET" })
         slug: string;
         description: string;
         sort_order: number;
-      }>`select id, name, slug, description, sort_order from categories order by sort_order`
+      }>`select id, name, slug, description, sort_order from categories c
+          where exists (
+            select 1 from products p
+            where p.category_id = c.id and p.published = true and p.archived = false and p.is_placeholder = false
+          )
+          order by sort_order`
     ).map(mapCategory);
 
-    const where = ["p.published = true", "p.archived = false"];
+    // Placeholder (demo) products stay reachable by direct link but are never listed.
+    const where = ["p.published = true", "p.archived = false", "p.is_placeholder = false"];
     const params: unknown[] = [];
     if (data.category) {
       params.push(data.category);
@@ -152,7 +158,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       await sql.query<Parameters<typeof mapCard>[0]>(
         `select ${PRODUCT_SELECT} from products p
          join categories c on c.id = p.category_id
-         where p.published = true and p.archived = false and p.id <> $1
+         where p.published = true and p.archived = false and p.is_placeholder = false and p.id <> $1
          order by (p.category_id = $2) desc, p.featured desc
          limit 3`,
         [product.id, product.categoryId],
