@@ -38,7 +38,7 @@ function Login() {
     <main className="grid min-h-dvh place-items-center bg-paper px-6">
       <div className="w-full max-w-sm">
         <Link to="/" className="font-display text-2xl">
-          Fieldnote
+          Cairn
         </Link>
         <h1 className="mt-8 font-display text-3xl">Publisher sign-in</h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
