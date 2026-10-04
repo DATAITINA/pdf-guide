@@ -23,15 +23,11 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
           className="flex min-w-0 items-center gap-2.5"
           onClick={() => setOpen(false)}
         >
-          <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
-          <span className="flex min-w-0 flex-col leading-none">
-            <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">
-              {settings.storeName}
-            </span>
-            <span className="mt-1 text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">
-              Small steps, clearly marked
-            </span>
-          </span>
+          <img
+            src="/cairn-logo.svg"
+            alt={`${settings.storeName} — Small steps, clearly marked`}
+            className="h-11 w-auto max-w-[185px] shrink-0"
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Primary">
@@ -128,10 +124,11 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
     <footer className="mt-20 border-t border-line bg-paper-2/60">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
-          <div className="flex items-center gap-3">
-            <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
-            <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
-          </div>
+          <img
+            src="/cairn-logo.svg"
+            alt={`${settings.storeName} — Small steps, clearly marked`}
+            className="h-12 w-auto max-w-[205px]"
+          />
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{settings.tagline}</p>
           <p className="mt-4 text-sm text-muted">
             Practical digital guides you can download and keep — written for ordinary days, not

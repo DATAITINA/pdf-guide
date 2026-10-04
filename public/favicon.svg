@@ -1,6 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Cairn</title>
   <rect x="1" y="1" width="62" height="62" rx="18" fill="#1A4D47"/>
-  <ellipse cx="32" cy="46" rx="18" ry="7.5" fill="#E8E4D6"/>
-  <ellipse cx="32" cy="33" rx="13" ry="6.2" fill="#F2EFE3"/>
-  <ellipse cx="32" cy="21" rx="8.5" ry="5.2" fill="#FAF7ED"/>
+  <path d="M10 51 17 41h30l7 10H10Z" fill="#E9E5D8"/>
+  <path d="m15 38 7-11h20l7 11H15Z" fill="#F4F0E5"/>
+  <path d="m23 24 5-9h8l5 9H23Z" fill="#FFFDF5"/>
+  <path d="M10 51h44" stroke="#AEB9A9" stroke-width="1.25" stroke-linecap="round" opacity=".8"/>
 </svg>
