@@ -6,7 +6,7 @@ export const Route = createFileRoute("/privacy")({
   loader: () => getSiteSettings(),
   component: Privacy,
   head: ({ loaderData }) => ({
-    meta: [{ title: `Privacy policy — ${loaderData?.storeName ?? "Fieldnote"}` }],
+    meta: [{ title: `Privacy policy — ${loaderData?.storeName ?? "Cairn"}` }],
   }),
 });
 
