@@ -16,11 +16,11 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "Tell us your problem. Get a practical guide made for you. Clear digital guides for everyday life.",
+          "Tell us your problem. Get a guide made for you. Ready-made PDFs or a personal guide with check-ins, sent on WhatsApp.",
       },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/fieldnote-mark.svg" },
+      { rel: "icon", type: "image/svg+xml", href: "/cairn-mark.svg" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },

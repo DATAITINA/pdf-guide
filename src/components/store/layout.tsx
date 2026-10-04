@@ -23,7 +23,7 @@ export function StoreHeader({ settings }: { settings: StoreSettings }) {
           className="flex min-w-0 items-center gap-2.5"
           onClick={() => setOpen(false)}
         >
-          <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
+          <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-10 shrink-0" />
           <span className="flex min-w-0 flex-col leading-none">
             <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">
               {settings.storeName}
@@ -129,12 +129,13 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
-            <img src="/fieldnote-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
+            <img src="/cairn-mark.svg" alt="" aria-hidden="true" className="size-11 shrink-0" />
             <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
           </div>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{settings.tagline}</p>
           <p className="mt-4 text-sm text-muted">
-            Practical digital guides you can download and keep — written for ordinary days, not perfect ones.
+            Practical digital guides you can download and keep — written for ordinary days, not
+            perfect ones.
           </p>
         </div>
         <div>

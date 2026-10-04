@@ -8,7 +8,7 @@ const PUBLISHER_NAME =
   process.env.PUBLISHER_NAME?.trim() || "David Bassey Itina";
 
 /**
- * Create the Fieldnote publisher account if it does not already exist.
+ * Create the Cairn publisher account if it does not already exist.
  * Safe to call on every seed — sign-up fails quietly when the email is taken.
  */
 export async function ensurePublisherUser(): Promise<void> {
