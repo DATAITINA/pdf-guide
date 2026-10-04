@@ -5,9 +5,8 @@ import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { newId } from "./ids";
 import {
-  PRESET_TOPICS,
-  PUBLIC_COUNT_MIN,
-  TOPIC_REQUEST_THRESHOLD,
+  normalizeNigerianWhatsapp,
+  REQUEST_MAX_LENGTH,
   VOUCHER_ACTIVE_DAYS,
   VOUCHER_ALPHABET,
   VOUCHER_DISCOUNT_KOBO,
@@ -33,7 +32,7 @@ export function normalizeTopicName(raw: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9\s+-]/g, "")
     .replace(/\s+/g, " ")
-    .slice(0, 80);
+    .slice(0, REQUEST_MAX_LENGTH);
 }
 
 export function generateVoucherCode(): string {
@@ -50,54 +49,18 @@ function sanitizeTopicDisplay(raw: string): string {
     .trim()
     .replace(/[<>"'`]/g, "")
     .replace(/\s+/g, " ")
-    .slice(0, 80);
+    .slice(0, REQUEST_MAX_LENGTH);
 }
 
-export type TopicBoardItem = {
-  id: string;
-  name: string;
-  count: number;
-  status: string;
-  showCount: boolean;
-  threshold: number;
-};
-
-export const getWaitlistBoard = createServerFn({ method: "GET" }).handler(async () => {
-  const sql = await getSql();
-  const rows = await sql.query<{
-    id: string;
-    name: string;
-    status: string;
-    cnt: number;
-  }>(
-    `select t.id, t.name, t.status, count(e.id)::int as cnt
-     from waitlist_topics t
-     left join waitlist_entries e on e.topic_id = t.id
-     where t.status in ('requested', 'building')
-     group by t.id, t.name, t.status
-     order by cnt desc, t.name asc
-     limit 24`,
-  );
-  const topics: TopicBoardItem[] = rows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    count: Number(r.cnt),
-    status: r.status,
-    showCount: Number(r.cnt) >= PUBLIC_COUNT_MIN,
-    threshold: TOPIC_REQUEST_THRESHOLD,
-  }));
-  return {
-    topics,
-    presets: [...PRESET_TOPICS],
-    threshold: TOPIC_REQUEST_THRESHOLD,
-    publicCountMin: PUBLIC_COUNT_MIN,
-  };
-});
-
 const joinSchema = z.object({
-  topic: z.string().trim().min(2).max(80),
-  email: z.string().trim().email().max(200),
-  whatsapp: z.string().trim().max(40).optional(),
+  topic: z.string().trim().min(2).max(REQUEST_MAX_LENGTH),
+  name: z.string().trim().max(80).optional(),
+  email: z.string().trim().email().max(200).optional().or(z.literal("")),
+  whatsapp: z
+    .string()
+    .trim()
+    .max(40)
+    .refine((v) => normalizeNigerianWhatsapp(v) !== null, "Enter a Nigerian WhatsApp number, like 0803 123 4567."),
   consent: z.literal(true),
   honeypot: z.string().max(0).optional().or(z.literal("")),
   clientIp: z.string().max(80).optional(),
@@ -116,10 +79,16 @@ export const joinWaitlist = createServerFn({ method: "POST" })
 
     const displayName = sanitizeTopicDisplay(data.topic);
     const normalized = normalizeTopicName(displayName);
-    if (normalized.length < 2) throw new Error("Please choose or type a topic.");
+    if (normalized.length < 2) throw new Error("Please tell us what you need help with.");
 
-    const email = data.email.trim().toLowerCase();
-    const whatsapp = data.whatsapp?.trim() || null;
+    const number = normalizeNigerianWhatsapp(data.whatsapp)!;
+    const realEmail = data.email?.trim().toLowerCase() || null;
+    // waitlist_entries.email is NOT NULL and unique per topic, and there is no
+    // name column. Without changing the schema: people who skip email are keyed
+    // by their WhatsApp number, and the optional name rides along with it.
+    const email = realEmail ?? `whatsapp:${number}`;
+    const name = data.name ? sanitizeTopicDisplay(data.name).slice(0, 80) : "";
+    const whatsapp = name ? `${number} (${name})` : number;
     const sql = await getSql();
 
     let topics = await sql.query<{ id: string; name: string; status: string }>(
@@ -212,16 +181,13 @@ export const joinWaitlist = createServerFn({ method: "POST" })
       }
     }
 
-    try {
-      const { sendWaitlistConfirmEmail } = await import("./email.server");
-      await sendWaitlistConfirmEmail({
-        to: email,
-        topicName: topic.name,
-        code,
-        position,
-      });
-    } catch {
-      /* email is best-effort */
+    if (realEmail) {
+      try {
+        const { sendWaitlistConfirmEmail } = await import("./email.server");
+        await sendWaitlistConfirmEmail({ to: realEmail, topicName: topic.name });
+      } catch {
+        /* email is best-effort */
+      }
     }
 
     return {
