@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, Copy, Loader2 } from "lucide-react";
 import { getWaitlistBoard, joinWaitlist, type TopicBoardItem } from "@/lib/store/waitlist";
+import { isNigerianWhatsapp } from "@/lib/store/whatsapp";
 import { TOPIC_REQUEST_THRESHOLD } from "@/lib/store/waitlist-config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +94,10 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
       setError("WhatsApp number is required so we can send your guide.");
       return;
     }
+    if (!isNigerianWhatsapp(whatsapp)) {
+      setError("Enter a Nigerian number like 0801 234 5678 or +234 801 234 5678.");
+      return;
+    }
     if (!consent) {
       setError("Please agree to be contacted about this guide.");
       return;
@@ -142,10 +147,12 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
       <p className="text-xs tracking-[0.22em] text-accent uppercase">Personal guide</p>
       <h2 className="mt-2 font-display text-3xl tracking-tight">Request your personal guide</h2>
       <p className="mt-3 text-muted">
-        Tell us the situation you’re dealing with. We’ll write a practical guide for it and send it on WhatsApp.
+        Tell us the situation you’re dealing with. We’ll write a practical guide for it and send it
+        on WhatsApp.
       </p>
       <p className="mt-2 text-sm text-muted">
-        What happens next: we confirm on WhatsApp, agree the scope, then write and deliver your guide with check-ins.
+        What happens next: we confirm on WhatsApp, agree the scope, then write and deliver your
+        guide with check-ins.
       </p>
       <p className="mt-2 text-sm text-muted">
         This voucher is for future guides, not the ones already available.
@@ -176,7 +183,9 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
             <div className="ticket-card rounded-[18px] border border-dashed border-accent/40 bg-surface px-6 py-7 shadow-card">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">Request received</p>
+                  <p className="text-[11px] tracking-[0.16em] text-accent uppercase">
+                    Request received
+                  </p>
                   <p className="mt-1 font-display text-xl tracking-tight">{ticket.topicName}</p>
                   <p className="mt-1 text-sm text-muted">
                     You're #{ticket.position} for this topic
@@ -184,7 +193,9 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
                   </p>
                 </div>
               </div>
-              <p className="mt-6 font-mono text-2xl tracking-[0.12em] text-ink tabular-nums">{revealed || "· · ·"}</p>
+              <p className="mt-6 font-mono text-2xl tracking-[0.12em] text-ink tabular-nums">
+                {revealed || "· · ·"}
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button type="button" size="sm" onClick={() => void copyCode()}>
                   {copied ? (
@@ -198,9 +209,7 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
                   )}
                 </Button>
               </div>
-              <p className="mt-4 text-sm text-muted">
-                We’ll message you on WhatsApp to confirm details and next steps.
-              </p>
+              <p className="mt-4 text-sm text-muted">Thanks. We'll message you on WhatsApp soon.</p>
             </div>
           </div>
         ) : (
@@ -226,7 +235,9 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
                   type="button"
                   onClick={pickOther}
                   className={`min-h-11 rounded-full px-3.5 py-2 text-sm transition-colors ${
-                    otherOpen ? "bg-accent text-accent-fg" : "bg-paper-2 text-ink hover:bg-paper-2/80"
+                    otherOpen
+                      ? "bg-accent text-accent-fg"
+                      : "bg-paper-2 text-ink hover:bg-paper-2/80"
                   }`}
                 >
                   Other
@@ -246,7 +257,7 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
 
             <div>
               <label htmlFor="waitlist-email" className="mb-1.5 block text-sm font-medium">
-                Name or email
+                Email
               </label>
               <Input
                 id="waitlist-email"
@@ -275,7 +286,9 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
                 className="min-h-12"
                 aria-required="true"
               />
-              <p className="mt-1.5 text-xs text-muted">Required — we’ll send your guide and check-ins here.</p>
+              <p className="mt-1.5 text-xs text-muted">
+                Required — we’ll send your guide and check-ins here.
+              </p>
             </div>
 
             {/* Honeypot */}
@@ -299,8 +312,8 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
                 required
               />
               <span>
-                I agree to be contacted about this guide on WhatsApp or email. Data handled per the Nigeria Data
-                Protection Act.
+                I agree to be contacted about this guide on WhatsApp or email. Data handled per the
+                Nigeria Data Protection Act.
               </span>
             </label>
 
@@ -310,7 +323,12 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
               </p>
             ) : null}
 
-            <Button type="submit" size="lg" disabled={pending} className="min-h-12 w-full sm:w-auto">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={pending}
+              className="min-h-12 w-full sm:w-auto"
+            >
               {pending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" /> Sending…
@@ -325,7 +343,9 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
 
       <div className="mt-12 border-t border-line pt-10">
         <p className="text-sm font-medium">Requested topics</p>
-        <p className="mt-1 text-sm text-muted">The most requested topic helps us decide what to write next.</p>
+        <p className="mt-1 text-sm text-muted">
+          The most requested topic helps us decide what to write next.
+        </p>
         {board.length === 0 ? (
           <p className="mt-6 text-sm text-muted">Be the first to request a topic above.</p>
         ) : (

@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { newId } from "./ids";
+import { isNigerianWhatsapp } from "./whatsapp";
 import {
   PRESET_TOPICS,
   PUBLIC_COUNT_MIN,
@@ -37,7 +37,8 @@ export function normalizeTopicName(raw: string): string {
 }
 
 export function generateVoucherCode(): string {
-  const bytes = randomBytes(8);
+  const bytes = new Uint8Array(8);
+  globalThis.crypto.getRandomValues(bytes);
   let out = "";
   for (let i = 0; i < 8; i++) {
     out += VOUCHER_ALPHABET[bytes[i]! % VOUCHER_ALPHABET.length];
@@ -97,7 +98,12 @@ export const getWaitlistBoard = createServerFn({ method: "GET" }).handler(async 
 const joinSchema = z.object({
   topic: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(200),
-  whatsapp: z.string().trim().max(40).optional(),
+  whatsapp: z
+    .string()
+    .trim()
+    .min(1, "WhatsApp number is required so we can send your guide.")
+    .max(40)
+    .refine(isNigerianWhatsapp, "Enter a Nigerian number like 0801 234 5678 or +234 801 234 5678."),
   consent: z.literal(true),
   honeypot: z.string().max(0).optional().or(z.literal("")),
   clientIp: z.string().max(80).optional(),
@@ -107,7 +113,13 @@ export const joinWaitlist = createServerFn({ method: "POST" })
   .validator(joinSchema)
   .handler(async ({ data }) => {
     if (data.honeypot) {
-      return { ok: true as const, duplicate: false, code: "FN-XXXX-XXXX", position: 1, topicName: "Thanks" };
+      return {
+        ok: true as const,
+        duplicate: false,
+        code: "FN-XXXX-XXXX",
+        position: 1,
+        topicName: "Thanks",
+      };
     }
     const ip = data.clientIp || "unknown";
     if (!rateLimit(`waitlist:${ip}`, 8, 60_000)) {
@@ -119,7 +131,7 @@ export const joinWaitlist = createServerFn({ method: "POST" })
     if (normalized.length < 2) throw new Error("Please choose or type a topic.");
 
     const email = data.email.trim().toLowerCase();
-    const whatsapp = data.whatsapp?.trim() || null;
+    const whatsapp = data.whatsapp.trim();
     const sql = await getSql();
 
     let topics = await sql.query<{ id: string; name: string; status: string }>(
@@ -135,9 +147,10 @@ export const joinWaitlist = createServerFn({ method: "POST" })
          on conflict (normalized_name) do nothing`,
         [topicId, displayName, normalized],
       );
-      topics = await sql.query(`select id, name, status from waitlist_topics where normalized_name = $1 limit 1`, [
-        normalized,
-      ]);
+      topics = await sql.query(
+        `select id, name, status from waitlist_topics where normalized_name = $1 limit 1`,
+        [normalized],
+      );
       topic = topics[0]!;
     }
 
@@ -306,7 +319,10 @@ export const validateVoucher = createServerFn({ method: "POST" })
     };
   });
 
-export async function redeemVoucherForOrder(orderId: string, voucherId: string | null): Promise<void> {
+export async function redeemVoucherForOrder(
+  orderId: string,
+  voucherId: string | null,
+): Promise<void> {
   if (!voucherId) return;
   const sql = await getSql();
   const updated = await sql.query<{ id: string }>(
@@ -346,10 +362,12 @@ export const launchTopic = createServerFn({ method: "POST" })
     const topic = topics[0];
     if (!topic) throw new Error("Topic not found.");
 
-    const products = await sql.query<{ id: string; title: string; slug: string; published: boolean }>(
-      `select id, title, slug, published from products where id = $1 limit 1`,
-      [data.productId],
-    );
+    const products = await sql.query<{
+      id: string;
+      title: string;
+      slug: string;
+      published: boolean;
+    }>(`select id, title, slug, published from products where id = $1 limit 1`, [data.productId]);
     const product = products[0];
     if (!product) throw new Error("Product not found.");
 
@@ -524,7 +542,10 @@ export const mergeTopics = createServerFn({ method: "POST" })
       [data.targetTopicId],
     );
     for (let i = 0; i < remaining.length; i++) {
-      await sql.query(`update waitlist_entries set position = $1 where id = $2`, [i + 1, remaining[i]!.id]);
+      await sql.query(`update waitlist_entries set position = $1 where id = $2`, [
+        i + 1,
+        remaining[i]!.id,
+      ]);
     }
     return { ok: true as const, moved: sourceEntries.length };
   });
@@ -534,9 +555,10 @@ export const setTopicBuilding = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await assertAdmin(data.adminSecret);
     const sql = await getSql();
-    await sql.query(`update waitlist_topics set status = 'building' where id = $1 and status = 'requested'`, [
-      data.topicId,
-    ]);
+    await sql.query(
+      `update waitlist_topics set status = 'building' where id = $1 and status = 'requested'`,
+      [data.topicId],
+    );
     return { ok: true as const };
   });
 
