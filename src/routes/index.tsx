@@ -176,7 +176,7 @@ function Home() {
           <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
             <span
               aria-hidden
-              className="absolute top-6 bottom-6 left-6 border-l-2 border-dotted border-accent-fg/35 md:top-6 md:right-[16%] md:bottom-auto md:left-[16%] md:border-t-2 md:border-l-0"
+              className="absolute top-6 right-[16%] left-[16%] hidden border-t-2 border-dotted border-accent-fg/35 md:block"
             />
             <Step n={1} title="Tell us what you need">
               Fill in the short form, or pick a ready-made guide.
@@ -189,7 +189,7 @@ function Home() {
                 <span className="font-semibold text-accent-fg">Ready-made:</span> pay by {payWith}.
               </span>
             </Step>
-            <Step n={3} title="Get your guide">
+            <Step n={3} title="Get your guide" last>
               Personal guides come on WhatsApp, and we check in to see how it’s going. Ready-made guides come as a
               download link once your payment is confirmed.
             </Step>
@@ -220,9 +220,13 @@ function Home() {
   );
 }
 
-function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function Step({ n, title, last, children }: { n: number; title: string; last?: boolean; children: React.ReactNode }) {
   return (
     <li className="relative flex gap-5 md:flex-col md:gap-4">
+      {/* Phone: dotted line down to the next step only, so nothing trails after step 3 */}
+      {last ? null : (
+        <span aria-hidden className="absolute top-12 -bottom-10 left-6 border-l-2 border-dotted border-accent-fg/35 md:hidden" />
+      )}
       <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-[45%_55%_50%_50%/55%_50%_50%_45%] bg-accent-fg font-display text-xl text-accent">
         {n}
       </span>
