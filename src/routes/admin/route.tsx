@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 import { RedirectToSignIn, UserButton } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 
@@ -50,6 +51,8 @@ function AdminLayout() {
       <div className="min-w-0">
         <Outlet />
       </div>
+      {/* Toasts are only used by the publisher pages, so they load here, not for customers. */}
+      <Toaster position="top-center" richColors={false} />
     </div>
   );
 }
