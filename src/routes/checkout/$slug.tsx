@@ -183,16 +183,18 @@ function CheckoutPage() {
                   >
                     Pay with Paystack · {formatMoney(finalKobo, product.currency)}
                   </Button>
-                ) : (
+                ) : null}
+                {data.payments.testPurchase ? (
                   <Button
                     type="button"
+                    variant="outline"
                     className="w-full"
                     disabled={pending}
                     onClick={() => onSubmit("demo")}
                   >
-                    Complete test purchase · {formatMoney(finalKobo, product.currency)}
+                    Local test purchase (this computer only)
                   </Button>
-                )}
+                ) : null}
                 <Button
                   type="button"
                   variant="outline"
@@ -202,15 +204,9 @@ function CheckoutPage() {
                 >
                   Pay by bank transfer
                 </Button>
-                {!data.payments.paystackConfigured ? (
-                  <p className="text-xs text-muted">
-                    Card payments are in test mode until Paystack keys are added. The test purchase unlocks
-                    the real PDF so you can try the download flow.
-                  </p>
-                ) : null}
-                {!data.payments.bankConfigured ? (
-                  <p className="text-xs text-muted">
-                    Bank transfer becomes available after the publisher adds account details in Settings.
+                {!data.payments.bankConfigured && !data.payments.paystackConfigured ? (
+                  <p className="text-sm text-muted">
+                    Payment isn’t open right now. Please message us on WhatsApp and we’ll help you buy this guide.
                   </p>
                 ) : null}
               </div>

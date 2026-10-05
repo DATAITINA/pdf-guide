@@ -281,11 +281,14 @@ export const reviewTransfer = createServerFn({ method: "POST" })
     await requireStoreAdmin(context.userId);
     const { fulfillPaidOrder } = await import("./fulfill.server");
     const sql = await getSql();
-    const orders = await sql.query<{ id: string; status: string }>(
-      `select id, status from orders where id = $1`,
+    const orders = await sql.query<{ id: string; status: string; payment_method: string }>(
+      `select id, status, payment_method from orders where id = $1`,
       [data.orderId],
     );
     if (!orders[0]) throw new Error("Order not found");
+    if (data.action === "approve" && orders[0].payment_method !== "bank_transfer") {
+      throw new Error("Only bank-transfer orders can be approved here.");
+    }
     if (data.action === "reject") {
       await sql`update orders
         set status = ${ORDER_STATUS.rejected},
@@ -296,7 +299,10 @@ export const reviewTransfer = createServerFn({ method: "POST" })
       return { ok: true, downloadPath: null as string | null };
     }
     await sql`update orders set admin_notes = ${data.notes || null}, updated_at = now() where id = ${data.orderId}`;
-    const fulfilled = await fulfillPaidOrder(data.orderId, data.origin);
+    const fulfilled = await fulfillPaidOrder(data.orderId, data.origin, {
+      kind: "transfer_approved",
+      adminUserId: context.userId,
+    });
     return { ok: true, downloadPath: fulfilled.downloadPath };
   });
 

@@ -4,6 +4,7 @@ import { newId, newToken } from "./ids";
 import { mapSettings } from "./map";
 import { emailConfigured, sendPurchaseEmail } from "./email.server";
 import { DEFAULT_SETTINGS, ORDER_STATUS } from "./types";
+import { assertPaymentProof, guardEnv, type PaymentProof } from "./payment-guard";
 
 export function appBaseUrl(requestUrl?: string): string {
   const fromEnv = env("APP_URL");
@@ -19,7 +20,9 @@ export function appBaseUrl(requestUrl?: string): string {
   return "";
 }
 
-export async function fulfillPaidOrder(orderId: string, requestUrl?: string) {
+export async function fulfillPaidOrder(orderId: string, requestUrl: string | undefined, proof: PaymentProof) {
+  // Refuse before touching the order: no proof, no paid status, no download token.
+  assertPaymentProof(proof, guardEnv(env("PAYSTACK_SECRET_KEY")));
   const sql = await getSql();
   const orders = await sql.query<{
     id: string;
