@@ -188,7 +188,7 @@ function Home() {
           <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
             <span
               aria-hidden
-              className="absolute top-6 right-[16%] left-[16%] hidden border-t-2 border-dotted border-accent-fg/35 md:block"
+              className="absolute top-6 right-[calc((100%_-_4rem)/3_-_1.5rem)] left-6 hidden border-t-2 border-dotted border-accent-fg/35 md:block"
             />
             <Step n={1} title="Tell us what you need">
               Fill in the short form, or pick a ready-made guide.
