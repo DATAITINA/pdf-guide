@@ -8,7 +8,7 @@ import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
 import { WaitlistSection } from "@/components/store/waitlist-section";
 import { FaqList, SectionHeading } from "@/components/store/blocks";
-import { CairnStones, TrailLine } from "@/components/store/cairn-art";
+import { CairnStones } from "@/components/store/cairn-art";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -41,9 +41,8 @@ function Home() {
   return (
     <PageShell settings={data.settings}>
       {/* Hero: what Cairn does, one main action */}
-      <section className="relative overflow-hidden">
-        <TrailLine className="absolute -right-16 bottom-10 hidden w-[480px] text-accent/25 lg:block" />
-        <div className="page pt-10 pb-14 sm:pt-16 md:pt-24 md:pb-24">
+      <section>
+        <div className="page grid gap-10 pt-10 pb-14 sm:pt-16 md:pt-20 md:pb-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
           <div className="animate-rise-in max-w-3xl">
             <p className="eyebrow flex items-center gap-2">
               <CairnStones className="size-4" />
@@ -60,7 +59,10 @@ function Home() {
                 </a>
               </Button>
               <Link to="/guides" className="link link-tap justify-center sm:justify-start">
-                Or browse ready-made guides{fromPrice ? ` from ${fromPrice}` : ""}
+                <span>
+                  Or browse ready-made guides{" "}
+                  {fromPrice ? <span className="whitespace-nowrap">from {fromPrice}</span> : null}
+                </span>
               </Link>
             </div>
             <ul className="mt-8 flex flex-col gap-2 text-muted sm:flex-row sm:gap-6">
@@ -72,6 +74,16 @@ function Home() {
               </li>
             </ul>
           </div>
+          <img
+            src="/covers/hero-books-1440.webp"
+            srcSet="/covers/hero-books-720.webp 720w, /covers/hero-books-1440.webp 1440w"
+            sizes="(min-width: 1024px) 45vw, calc(100vw - 2rem)"
+            alt="Three printed guides standing on a wooden table in soft morning light"
+            width={1440}
+            height={810}
+            decoding="async"
+            className="animate-fade-in aspect-[16/9] w-full rounded-2xl object-cover shadow-raised lg:aspect-[4/3]"
+          />
         </div>
       </section>
 
