@@ -510,10 +510,9 @@ async function assertAdmin(adminSecret?: string) {
   if (secret && adminSecret && adminSecret === secret) return;
   // Fall through to session-based admin when secret not provided
   try {
-    const { getAuth } = await import("@/lib/auth/server");
-    const { headers } = await import("@tanstack/react-start/server");
-    const auth = getAuth();
-    const session = await auth.api.getSession({ headers: await headers() });
+    const { auth } = await import("@/lib/auth/server");
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const session = await auth.api.getSession({ headers: getRequest().headers });
     if (!session?.user?.id) throw new Error("Unauthorized");
     const sql = await getSql();
     const admins = await sql.query(`select user_id from store_admins where user_id = $1 limit 1`, [

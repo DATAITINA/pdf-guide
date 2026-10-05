@@ -208,7 +208,7 @@ function tocToText(toc: { title: string; children?: string[] }[]): string {
 function textToToc(text: string): { title: string; children?: string[] }[] {
   return text
     .split(/\n\s*\n/)
-    .map((block) => {
+    .map((block): { title: string; children?: string[] } | null => {
       const rows = block
         .split("\n")
         .map((l) => l.trimEnd())
