@@ -1,10 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Share2 } from "lucide-react";
+import { Check, Share2 } from "lucide-react";
 import { getProductBySlug } from "@/lib/store/catalog";
 import { formatMoney } from "@/lib/store/money";
+import { coverSources } from "@/lib/store/covers";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
 import { Button } from "@/components/ui/button";
+import { FaqList, PersonalGuideCta } from "@/components/store/blocks";
 
 export const Route = createFileRoute("/guides/$slug")({
   loader: async ({ params }) => {
@@ -33,11 +35,12 @@ export const Route = createFileRoute("/guides/$slug")({
 function ProductPage() {
   const data = Route.useLoaderData();
   const product = data.product!;
-  const priceLabel = product.isPlaceholder
-    ? null
-    : formatMoney(product.priceKobo, product.currency);
+  const priceLabel = product.isPlaceholder ? null : formatMoney(product.priceKobo, product.currency);
+  const cover = coverSources(product.coverImage);
+  // Only name the payment methods that work today.
+  const payWith = data.payments.paystackConfigured ? "card or bank transfer" : "bank transfer";
 
-  const whatsapp = () => {
+  const share = () => {
     const url = typeof window !== "undefined" ? window.location.href : `/guides/${product.slug}`;
     const text = `Check out this guide:\n${product.title}\n${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
@@ -45,112 +48,95 @@ function ProductPage() {
 
   return (
     <PageShell settings={data.settings}>
-      <article className="mx-auto grid max-w-6xl gap-10 px-4 pt-8 pb-24 sm:px-6 sm:pt-10 lg:grid-cols-[0.9fr_1.1fr] lg:pb-20">
-        <div>
-          <div className="overflow-hidden rounded-[28px] bg-paper-2 shadow-card">
+      <article className="page section-sm grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div className="mx-auto w-full max-w-xs sm:max-w-sm lg:max-w-none">
+          <div className="overflow-hidden rounded-xl bg-paper-2 shadow-card">
             <img
-              src={product.coverImage}
+              src={cover.src}
+              srcSet={cover.srcSet}
+              sizes="(min-width: 1024px) 400px, 320px"
               alt={`Cover of ${product.title}`}
-              className="w-full object-cover"
+              width={800}
+              height={1200}
+              className="aspect-2/3 w-full object-cover"
+              fetchPriority="high"
             />
           </div>
         </div>
         <div>
-          <p className="text-xs tracking-[0.18em] text-accent uppercase">{product.categoryName}</p>
+          <p className="eyebrow">{product.categoryName}</p>
+          <h1 className="h-section mt-3 text-ink">{product.title}</h1>
+          {product.subtitle ? <p className="lead mt-3">{product.subtitle}</p> : null}
+          <p className="mt-4 text-ink/90">{product.shortDescription}</p>
+
           {product.isPlaceholder ? (
-            <p className="mt-3 inline-block rounded-full bg-ink px-3 py-1 text-xs tracking-wide text-paper uppercase">
-              Demo / placeholder
-            </p>
-          ) : null}
-          <h1 className="mt-3 font-display text-[2rem] leading-[1.12] tracking-tight sm:text-4xl">
-            {product.title}
-          </h1>
-          {product.subtitle ? <p className="mt-3 text-lg text-muted">{product.subtitle}</p> : null}
-          <p className="mt-4 text-base leading-relaxed text-ink/90">{product.shortDescription}</p>
-          <div className="mt-6 flex flex-wrap items-end gap-4">
-            <p className="font-display text-3xl tabular-nums tracking-tight">
-              {product.isPlaceholder ? "Not for sale" : priceLabel}
-            </p>
-            {product.pages ? (
-              <p className="text-sm text-muted">{product.pages} pages · PDF</p>
-            ) : (
-              <p className="text-sm text-muted">Digital PDF</p>
-            )}
-          </div>
-          <ul className="mt-5 space-y-1.5 text-sm text-muted">
-            <li>Instant download after payment is confirmed</li>
-            <li>Pay once — keep the file on your phone or laptop</li>
-            <li>No subscription</li>
-          </ul>
-          <div className="mt-7 hidden flex-col gap-3 sm:flex sm:flex-row">
-            {product.isPlaceholder ? (
-              <Button disabled className="w-full sm:w-auto">
-                Demo product — not for sale
-              </Button>
-            ) : (
-              <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link to="/checkout/$slug" params={{ slug: product.slug }}>
-                  Buy now · {priceLabel}
-                </Link>
-              </Button>
-            )}
-            <Button type="button" variant="outline" size="lg" onClick={whatsapp} className="w-full sm:w-auto">
-              <Share2 className="size-4" /> Share
-            </Button>
-          </div>
+            <p className="card-soft mt-8 px-5 py-4 text-muted">This is a sample listing and isn’t for sale.</p>
+          ) : (
+            <div className="card mt-8 p-5 sm:p-6">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className="font-display text-3xl tabular-nums text-ink">{priceLabel}</p>
+                <p className="text-muted">{product.pages ? `${product.pages}-page PDF` : "PDF guide"}</p>
+              </div>
+              <ul className="mt-4 space-y-2 text-muted">
+                {[
+                  `Pay by ${payWith}`,
+                  "Download link as soon as your payment is confirmed",
+                  "Keep the PDF on your phone or laptop",
+                ].map((line) => (
+                  <li key={line} className="flex gap-2">
+                    <Check className="mt-1.5 size-4 shrink-0 text-accent" aria-hidden />
+                    {line}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="w-full sm:w-auto">
+                  <Link to="/checkout/$slug" params={{ slug: product.slug }}>
+                    Buy this guide · {priceLabel}
+                  </Link>
+                </Button>
+                <Button type="button" variant="secondary" size="lg" onClick={share} className="w-full sm:w-auto">
+                  <Share2 className="size-4" aria-hidden /> Share on WhatsApp
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </article>
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-4 pb-14 sm:px-6 lg:grid-cols-2">
+      <section className="page grid gap-10 pb-16 lg:grid-cols-2 lg:gap-16">
         <div>
-          <h2 className="font-display text-2xl tracking-tight">What is this?</h2>
+          <h2 className="h-card text-ink">What is this?</h2>
           {product.fullDescription.split("\n\n").map((p) => (
-            <p key={p.slice(0, 24)} className="mt-3 text-[15px] leading-relaxed text-muted">
+            <p key={p.slice(0, 24)} className="mt-3 text-muted">
               {p}
             </p>
           ))}
         </div>
         <div>
-          <h2 className="font-display text-2xl tracking-tight">Who is it for?</h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-muted">
-            {product.audience || "Readers who want a practical, downloadable guide."}
-          </p>
-          <h2 className="mt-8 font-display text-2xl tracking-tight">What will I learn?</h2>
-          <ul className="mt-3 space-y-2.5 text-[15px] text-muted">
-            {(product.learnings.length ? product.learnings : ["A clear, practical take on the topic."]).map(
-              (item) => (
-                <li key={item} className="flex gap-2.5">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" />
-                  <span>{item}</span>
-                </li>
-              ),
-            )}
+          <h2 className="h-card text-ink">Who is it for?</h2>
+          <p className="mt-3 text-muted">{product.audience || "Readers who want a practical, downloadable guide."}</p>
+          <h2 className="h-card mt-10 text-ink">What will I learn?</h2>
+          <ul className="mt-3 space-y-3 text-muted">
+            {(product.learnings.length ? product.learnings : ["A clear, practical take on the topic."]).map((item) => (
+              <li key={item} className="flex gap-3">
+                <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" />
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
 
-      {product.benefits.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
-          <h2 className="font-display text-2xl tracking-tight">Why this guide helps</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {product.benefits.map((b) => (
-              <p key={b} className="rounded-[18px] bg-paper-2/80 px-4 py-4 text-sm leading-relaxed">
-                {b}
-              </p>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {product.tableOfContents.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
-          <h2 className="font-display text-2xl tracking-tight">What’s inside</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <section className="page pb-16">
+          <h2 className="h-card text-ink">What’s inside</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
             {product.tableOfContents.map((section) => (
-              <div key={section.title} className="rounded-[18px] border border-line bg-surface px-5 py-4">
-                <p className="font-medium">{section.title}</p>
+              <div key={section.title} className="card px-5 py-4">
+                <h3 className="font-sans text-base font-semibold tracking-normal text-ink">{section.title}</h3>
                 {section.children?.length ? (
-                  <ul className="mt-2 space-y-1 text-sm text-muted">
+                  <ul className="mt-2 space-y-1 text-muted">
                     {section.children.map((child) => (
                       <li key={child}>{child}</li>
                     ))}
@@ -162,65 +148,56 @@ function ProductPage() {
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
-        <h2 className="font-display text-2xl tracking-tight">What’s included</h2>
-        <ul className="mt-4 grid gap-2 text-sm text-muted md:grid-cols-2">
-          {(product.included.length
-            ? product.included
-            : ["Instant PDF download after payment is confirmed"]
-          ).map((item) => (
-            <li key={item} className="flex gap-2">
-              <span className="text-accent">✓</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-        {!product.isPlaceholder ? (
-          <div className="mt-8 hidden sm:block">
-            <Button asChild size="lg">
-              <Link to="/checkout/$slug" params={{ slug: product.slug }}>
-                Buy now · {priceLabel}
-              </Link>
-            </Button>
-          </div>
-        ) : null}
+      {product.included.length > 0 ? (
+        <section className="page pb-16">
+          <h2 className="h-card text-ink">What’s included</h2>
+          <ul className="mt-4 grid gap-3 text-muted md:grid-cols-2">
+            {product.included.map((item) => (
+              <li key={item} className="flex gap-2">
+                <Check className="mt-1.5 size-4 shrink-0 text-accent" aria-hidden />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="page pb-16">
+        <PersonalGuideCta />
       </section>
 
       {data.faqs.length > 0 ? (
-        <section className="mx-auto max-w-3xl px-4 pb-14 sm:px-6">
-          <h2 className="font-display text-2xl tracking-tight">FAQ</h2>
-          <div className="mt-6 divide-y divide-line border-y border-line">
-            {data.faqs.map((faq) => (
-              <details key={faq.id} className="py-4">
-                <summary className="cursor-pointer font-medium">{faq.question}</summary>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{faq.answer}</p>
-              </details>
-            ))}
+        <section className="page-narrow pb-16">
+          <h2 className="h-card text-ink">Questions</h2>
+          <div className="mt-4">
+            <FaqList items={data.faqs} />
           </div>
         </section>
       ) : null}
 
       {data.related.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6 sm:pb-20">
-          <h2 className="font-display text-2xl tracking-tight">Related guides</h2>
-          <div className="mt-6 grid gap-6 sm:grid-cols-3">
+        <section className="page pb-28 sm:pb-24">
+          <h2 className="h-card text-ink">More ready-made guides</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {data.related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </section>
-      ) : null}
+      ) : (
+        <div className="h-16 sm:hidden" />
+      )}
 
       {!product.isPlaceholder ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 p-3 backdrop-blur-md sm:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur-md sm:hidden">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{product.title}</p>
-              <p className="tabular-nums text-sm text-muted">{priceLabel}</p>
+              <p className="truncate text-sm font-semibold text-ink">{product.title}</p>
+              <p className="text-sm text-muted tabular-nums">{priceLabel}</p>
             </div>
-            <Button asChild size="md" className="shrink-0">
+            <Button asChild className="shrink-0">
               <Link to="/checkout/$slug" params={{ slug: product.slug }}>
-                Buy now
+                Buy guide
               </Link>
             </Button>
           </div>
