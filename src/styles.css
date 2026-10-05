@@ -344,8 +344,8 @@
   }
   .check {
     margin-top: 0.125rem;
-    width: 1.375rem;
-    height: 1.375rem;
+    width: 1.5rem;
+    height: 1.5rem;
     flex-shrink: 0;
     accent-color: var(--color-accent);
   }

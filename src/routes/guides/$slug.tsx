@@ -27,7 +27,6 @@ export const Route = createFileRoute("/guides/$slug")({
         { name: "og:description", content: description },
         { name: "og:image", content: product?.coverImage ?? "/og.jpg" },
       ],
-      links: product ? [{ rel: "canonical", href: `/guides/${product.slug}` }] : [],
     };
   },
 });

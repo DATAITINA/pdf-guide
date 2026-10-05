@@ -4,7 +4,15 @@ import type { ProductCard as ProductCardType } from "@/lib/store/types";
 import { coverSources } from "@/lib/store/covers";
 
 /** One guide. Row layout on phones (cover left), stacked from 640px. */
-export function ProductCard({ product }: { product: ProductCardType }) {
+export function ProductCard({
+  product,
+  headingLevel = "h3",
+}: {
+  product: ProductCardType;
+  /** h2 when the cards sit directly under the page title. */
+  headingLevel?: "h2" | "h3";
+}) {
+  const Title = headingLevel;
   const cover = coverSources(product.coverImage);
   return (
     <article className="group h-full">
@@ -28,7 +36,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col py-1 sm:px-2 sm:pt-4 sm:pb-2">
           <p className="eyebrow">{product.categoryName}</p>
-          <h3 className="mt-2 font-display text-xl leading-snug text-ink">{product.title}</h3>
+          <Title className="mt-2 font-display text-xl leading-snug text-ink">{product.title}</Title>
           <p className="mt-2 line-clamp-2 text-muted">{product.shortDescription}</p>
           <div className="mt-auto flex items-center justify-between gap-3 pt-4">
             <span className="font-semibold tabular-nums text-ink">

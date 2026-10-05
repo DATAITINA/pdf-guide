@@ -159,7 +159,7 @@ function Catalogue() {
         ) : (
           <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {data.products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} headingLevel="h2" />
             ))}
           </div>
         )}
