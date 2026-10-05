@@ -55,7 +55,7 @@ function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-[10px] border border-line bg-paper-2 px-3 py-2 text-ink outline-none focus:border-accent"
+                className="field-control mt-1"
               />
             </label>
             <label className="block text-sm">
@@ -66,7 +66,7 @@ function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-[10px] border border-line bg-paper-2 px-3 py-2 text-ink outline-none focus:border-accent"
+                className="field-control mt-1"
               />
             </label>
             {error ? (

@@ -16,20 +16,20 @@ function DownloadPage() {
 
   return (
     <PageShell settings={data.settings}>
-      <section className="mx-auto max-w-lg px-4 py-16 text-center">
+      <section className="page-narrow section-sm text-center">
         {!access ? (
           <>
-            <h1 className="font-display text-4xl">This link is not valid</h1>
+            <h1 className="h-section text-ink">This link isn’t working</h1>
             <p className="mt-3 text-muted">
               The download may be expired, unused, or tied to a payment that is not confirmed. If you paid, contact {data.settings.supportEmail} with your order reference.
             </p>
           </>
         ) : (
           <>
-            <p className="text-xs tracking-[0.18em] text-accent uppercase">Payment successful</p>
-            <h1 className="mt-3 font-display text-4xl">Your guide is ready.</h1>
-            <img src={access.coverImage} alt="" className="mx-auto mt-8 w-40 rounded-[16px] shadow-card" />
-            <h2 className="mt-6 font-display text-2xl leading-snug">{access.title}</h2>
+            <p className="eyebrow">Payment confirmed</p>
+            <h1 className="h-section mt-3 text-ink">Your guide is ready</h1>
+            <img src={access.coverImage} alt="" className="mx-auto mt-8 w-40 rounded-lg shadow-card" width={160} height={240} />
+            <h2 className="h-card mt-6 text-ink">{access.title}</h2>
             <p className="mt-2 text-sm text-muted">
               Order {access.reference}
               <br />
