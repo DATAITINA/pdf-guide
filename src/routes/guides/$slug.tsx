@@ -49,12 +49,12 @@ function ProductPage() {
   return (
     <PageShell settings={data.settings}>
       <article className="page section-sm grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="mx-auto w-full max-w-xs sm:max-w-sm lg:max-w-none">
+        <div className="mx-auto w-full max-w-[13rem] sm:max-w-xs lg:max-w-none">
           <div className="overflow-hidden rounded-xl bg-paper-2 shadow-card">
             <img
               src={cover.src}
               srcSet={cover.srcSet}
-              sizes="(min-width: 1024px) 400px, 320px"
+              sizes="(min-width: 1024px) 400px, (min-width: 640px) 320px, 208px"
               alt={`Cover of ${product.title}`}
               width={800}
               height={1200}

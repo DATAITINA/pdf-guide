@@ -143,7 +143,7 @@ function CheckoutPage() {
                 alt=""
                 width={400}
                 height={600}
-                className="aspect-2/3 w-20 shrink-0 rounded-md object-cover md:w-full md:rounded-lg"
+                className="aspect-2/3 h-auto w-20 shrink-0 self-start rounded-md object-cover md:w-full md:rounded-lg"
               />
               <div className="min-w-0">
                 <p className="eyebrow">Your order</p>
