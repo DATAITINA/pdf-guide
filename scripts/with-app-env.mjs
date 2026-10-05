@@ -111,7 +111,11 @@ function main(argv) {
     process.exit(2);
   }
   const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
-  const child = spawn(command, args, { stdio: "inherit", env });
+  // Windows can only start npm bin shims (vite.cmd) through a shell; elsewhere spawn directly.
+  const viaShell = process.platform === "win32" && !/[\\/]/.test(command);
+  const child = viaShell
+    ? spawn([command, ...args].map((a) => (/\s/.test(a) ? `"${a}"` : a)).join(" "), { stdio: "inherit", env, shell: true })
+    : spawn(command, args, { stdio: "inherit", env });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));
