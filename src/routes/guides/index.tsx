@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { listCatalogue } from "@/lib/store/catalog";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
