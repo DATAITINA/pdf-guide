@@ -51,5 +51,5 @@ export async function processPaystackWebhook(
   if (!order) return;
   if (Number(order.amount_kobo) !== Number(payload.data.amount)) return;
   if (order.currency !== payload.data.currency) return;
-  await fulfillPaidOrder(order.id, env("APP_URL"));
+  await fulfillPaidOrder(order.id, env("APP_URL"), { kind: "paystack_verified", reference: payload.data.reference });
 }

@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Search } from "lucide-react";
 import { listCatalogue } from "@/lib/store/catalog";
 import { PageShell } from "@/components/store/layout";
 import { ProductCard } from "@/components/store/product-card";
-import { Input } from "@/components/ui/input";
+import { Input, Select } from "@/components/ui/input";
+import { PersonalGuideCta, RequestGuideLink, SectionHeading } from "@/components/store/blocks";
 import { Button } from "@/components/ui/button";
 
 type GuideSearch = {
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/guides/")({
       { title: `Guides — ${loaderData?.settings.storeName ?? "Cairn"}` },
       {
         name: "description",
-        content: "Browse practical digital PDF guides for parenting, money, work, and everyday life.",
+        content: "Ready-made PDF guides for everyday life, or ask for a personal guide made for your situation.",
       },
     ],
   }),
@@ -54,134 +55,118 @@ function Catalogue() {
 
   return (
     <PageShell settings={data.settings}>
-      <section className="mx-auto max-w-6xl px-4 pt-10 pb-20 sm:px-6 sm:pt-12">
-        <p className="text-xs tracking-[0.22em] text-accent uppercase">Catalogue</p>
-        <h1 className="mt-2 font-display text-4xl tracking-tight">All guides</h1>
-        <p className="mt-3 max-w-xl text-muted">
-          Search by title, filter by category, and open a guide to see what’s inside before you buy.
-        </p>
+      <section className="page section-sm">
+        <SectionHeading
+          as="h1"
+          eyebrow="Ready-made guides"
+          title="Guides already written"
+          lead="Open a guide to see what’s inside before you buy. Each one is a PDF you keep on your phone."
+        />
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="relative flex-1">
+            <label htmlFor="guide-search" className="sr-only">
+              Search guides
+            </label>
             <Search
-              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-subtle"
+              className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-subtle"
               aria-hidden
             />
             <Input
+              id="guide-search"
+              type="search"
               name="q"
               value={search.q ?? ""}
               onChange={(e) => updateSearch({ q: e.target.value })}
-              placeholder="Search guides…"
-              aria-label="Search guides"
-              className="pl-10"
+              placeholder="Search guides"
+              className="pl-12"
             />
-            {search.q ? (
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1 text-subtle hover:bg-paper-2 hover:text-ink"
-                aria-label="Clear search"
-                onClick={() => updateSearch({ q: "" })}
-              >
-                <X className="size-4" />
-              </button>
-            ) : null}
           </div>
-          <select
-            name="sort"
-            value={search.sort ?? "newest"}
-            onChange={(e) => updateSearch({ sort: e.target.value as GuideSearch["sort"] })}
-            className="h-12 rounded-[12px] border border-line bg-surface px-3 text-sm sm:w-48"
-            aria-label="Sort guides"
-          >
-            <option value="newest">Featured / newest</option>
-            <option value="title">Title A–Z</option>
-            <option value="price-asc">Price, low to high</option>
-            <option value="price-desc">Price, high to low</option>
-          </select>
+          <div className="sm:w-56">
+            <label htmlFor="guide-sort" className="sr-only">
+              Sort guides
+            </label>
+            <Select
+              id="guide-sort"
+              name="sort"
+              value={search.sort ?? "newest"}
+              onChange={(e) => updateSearch({ sort: e.target.value as GuideSearch["sort"] })}
+            >
+              <option value="newest">Featured first</option>
+              <option value="title">Title A–Z</option>
+              <option value="price-asc">Price, low to high</option>
+              <option value="price-desc">Price, high to low</option>
+            </Select>
+          </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => updateSearch({ category: "" })}
-            className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-              !search.category
-                ? "bg-accent text-accent-fg"
-                : "bg-paper-2 text-ink hover:bg-paper-2/80"
-            }`}
-          >
-            All
-          </button>
-          {data.categories.map((c) => (
+        {data.categories.length > 1 ? (
+          <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
             <button
-              key={c.id}
               type="button"
-              onClick={() => updateSearch({ category: c.slug })}
-              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-                search.category === c.slug
-                  ? "bg-accent text-accent-fg"
-                  : "bg-paper-2 text-ink hover:bg-paper-2/80"
-              }`}
+              className="chip"
+              aria-pressed={!search.category}
+              onClick={() => updateSearch({ category: "" })}
             >
-              {c.name}
+              All
             </button>
-          ))}
-        </div>
+            {data.categories.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className="chip"
+                aria-pressed={search.category === c.slug}
+                onClick={() => updateSearch({ category: c.slug })}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         {hasFilters ? (
-          <p className="mt-4 text-sm text-muted">
-            {data.products.length} {data.products.length === 1 ? "guide" : "guides"}
-            {search.q ? (
-              <>
-                {" "}
-                for <span className="font-medium text-ink">“{search.q}”</span>
-              </>
-            ) : null}
-            {search.category ? (
-              <>
-                {" "}
-                in{" "}
-                <span className="font-medium text-ink">
-                  {data.categories.find((c) => c.slug === search.category)?.name ?? search.category}
-                </span>
-              </>
-            ) : null}
-            {" · "}
-            <button
-              type="button"
-              className="font-medium text-accent hover:underline"
-              onClick={() => updateSearch({ q: "", category: "" })}
-            >
+          <p className="mt-4 flex flex-wrap items-center gap-x-2 text-muted" role="status">
+            <span>
+              {data.products.length} {data.products.length === 1 ? "guide" : "guides"}
+              {search.q ? (
+                <>
+                  {" "}
+                  for <span className="font-semibold text-ink">“{search.q}”</span>
+                </>
+              ) : null}
+            </span>
+            <button type="button" className="link link-tap" onClick={() => updateSearch({ q: "", category: "" })}>
               Clear filters
             </button>
           </p>
         ) : null}
 
         {data.products.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center rounded-[24px] border border-dashed border-line bg-surface px-6 py-16 text-center">
-            <p className="font-display text-2xl tracking-tight">No guides match</p>
-            <p className="mt-2 max-w-sm text-sm text-muted">
-              Try a different search term, or browse all categories to find something useful.
+          <div className="card mt-10 flex flex-col items-center px-6 py-14 text-center">
+            <h2 className="h-card text-ink">No guides match</h2>
+            <p className="mt-2 max-w-sm text-muted">
+              Try a different word, or ask for a guide made for your situation.
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-6"
-              onClick={() => updateSearch({ q: "", category: "" })}
-            >
-              Clear filters
-            </Button>
-            <Link to="/" className="mt-3 text-sm text-accent hover:underline">
-              Back to home
-            </Link>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Button type="button" variant="secondary" onClick={() => updateSearch({ q: "", category: "" })}>
+                Clear filters
+              </Button>
+              <Button asChild>
+                <RequestGuideLink>Request a personal guide</RequestGuideLink>
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {data.products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} headingLevel="h2" />
             ))}
           </div>
         )}
+
+        <div className="mt-16">
+          <PersonalGuideCta title="Can’t find what you need?" />
+        </div>
       </section>
     </PageShell>
   );

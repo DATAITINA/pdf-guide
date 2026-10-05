@@ -5,6 +5,7 @@ import { env } from "@/lib/env.server";
 import { newId } from "./ids";
 import { mapSettings } from "./map";
 import { DEFAULT_SETTINGS, ORDER_STATUS } from "./types";
+import { guardEnv, testPurchaseAllowed } from "./payment-guard";
 
 const checkoutSchema = z.object({
   slug: z.string().min(1),
@@ -77,15 +78,18 @@ export const startCheckout = createServerFn({ method: "POST" })
     const pricing = await resolveVoucher(data.voucherCode, product.id, Number(product.price_kobo));
     const sql = await getSql();
     const orderId = newId("ord");
-    const reference = `FN-${Date.now().toString(36)}-${newId().slice(0, 8)}`.toUpperCase();
+    const reference = `CRN-${Date.now().toString(36)}-${newId().slice(0, 8)}`.toUpperCase();
     const method = data.method;
     const paystackReady = Boolean(env("PAYSTACK_SECRET_KEY"));
 
     if (method === "paystack" && !paystackReady) {
-      throw new Error("Card payments are not configured yet. Use bank transfer or the test checkout.");
+      throw new Error("Card payment isn't available yet. Please pay by bank transfer.");
     }
-    if (method === "demo" && paystackReady) {
-      throw new Error("Test checkout is disabled when Paystack is configured.");
+    // The real request host (not the client-sent origin) decides; on Vercel this is always refused.
+    const { getRequestHost } = await import("@tanstack/react-start/server");
+    const requestHost = getRequestHost();
+    if (method === "demo" && !testPurchaseAllowed(requestHost, guardEnv(env("PAYSTACK_SECRET_KEY")))) {
+      throw new Error("This payment option isn't available.");
     }
 
     await sql.query(
@@ -111,7 +115,7 @@ export const startCheckout = createServerFn({ method: "POST" })
     );
 
     if (method === "demo") {
-      const fulfilled = await fulfillPaidOrder(orderId, data.origin);
+      const fulfilled = await fulfillPaidOrder(orderId, data.origin, { kind: "local_test", host: requestHost });
       return {
         kind: "download" as const,
         downloadPath: fulfilled.downloadPath,
@@ -223,7 +227,10 @@ export const verifyPaystack = createServerFn({ method: "POST" })
       throw new Error("Payment does not match this product.");
     }
 
-    const fulfilled = await fulfillPaidOrder(order.id, data.origin);
+    const fulfilled = await fulfillPaidOrder(order.id, data.origin, {
+      kind: "paystack_verified",
+      reference: body.data.reference,
+    });
     return {
       downloadPath: fulfilled.downloadPath,
       emailed: fulfilled.emailed,

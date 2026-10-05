@@ -20,6 +20,8 @@ import {
 import { renderInstallPage } from "./grok-pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// A blank workspace, so the store's own site.json / og.jpg don't leak into template tests.
+const BLANK_CWD = mkdtempSync(join(tmpdir(), "pwa-blank-"));
 
 test("injects before </head>", () => {
   const out = injectGrokPwaHead("<html><head><title>x</title></head><body></body></html>");
@@ -105,7 +107,7 @@ test("does not duplicate x:creator tags", () => {
 test("platform chrome overwrites share-card metas and always sets og:title", () => {
   const html =
     '<html><head><title>Hello World</title><meta property="og:title" content="Old"><meta name="twitter:card" content="summary"></head></html>';
-  const out = injectGrokPwaHead(html, { appName: "Wild Race" });
+  const out = injectGrokPwaHead(html, { appName: "Wild Race", cwd: BLANK_CWD });
   assert.match(out, /name="twitter:card" content="summary_large_image"/);
   assert.match(out, /property="og:title" content="Hello World"/);
   assert.doesNotMatch(out, /content="Old"/);
@@ -246,6 +248,7 @@ test("site title Grok App is a real name, not a sentinel", () => {
 test("published grok.me slug is still a title fallback", () => {
   const out = injectGrokPwaHead("<html><head></head></html>", {
     host: "wild-race.grok.me",
+    cwd: BLANK_CWD,
   });
   assert.match(out, /property="og:title" content="Wild Race"/);
 });
@@ -307,6 +310,7 @@ test("emits og:image for a public host and prefers a custom card", () => {
     appName: "Wild Race",
     host: "wild-race.grok.me",
     site: { title: "Wild Race" },
+    cwd: BLANK_CWD,
   });
   assert.match(
     placeholder,
@@ -327,6 +331,7 @@ test("placeholder og:image appends site.color when it is 6-digit hex", () => {
   const themed = injectGrokPwaHead("<html><head></head></html>", {
     host: "wild-race.grok.me",
     site: { title: "Wild Race", color: "#FF4D2E" },
+    cwd: BLANK_CWD,
   });
   assert.match(
     themed,
@@ -349,6 +354,7 @@ test("placeholder og:image appends site.color when it is 6-digit hex", () => {
 test("document title entities are not double-escaped on og:title", () => {
   const out = injectGrokPwaHead(
     "<html><head><title>Cats &amp; Dogs</title></head></html>",
+    { cwd: BLANK_CWD },
   );
   assert.match(out, /property="og:title" content="Cats &amp; Dogs"/);
   assert.doesNotMatch(out, /Cats &amp;amp; Dogs/);
@@ -363,14 +369,14 @@ test("site.json title wins over the host slug", () => {
 });
 
 test("injects into documents with no head element", () => {
-  const out = injectGrokPwaHead("<html><body>hi</body></html>", { appName: "Solo" });
+  const out = injectGrokPwaHead("<html><body>hi</body></html>", { appName: "Solo", cwd: BLANK_CWD });
   assert.match(out, /<head>/);
   assert.match(out, /property="og:title" content="Solo"/);
   assert.match(out, /<\/head>/);
 });
 
 test("streaming injector matches </HEAD> case-insensitively", () => {
-  const injector = createHeadInjector({ appName: "Wild Race" });
+  const injector = createHeadInjector({ appName: "Wild Race", cwd: BLANK_CWD });
   const chunks = [
     ...injector.push("<html><HEAD><title>x</title></HE"),
     ...injector.push("AD><body>hello</body></html>"),
@@ -378,6 +384,15 @@ test("streaming injector matches </HEAD> case-insensitively", () => {
   const out = Buffer.concat(chunks).toString("utf8");
   assert.match(out, /property="og:title" content="x"/);
   assert.match(out, /<body>hello<\/body>/);
+});
+
+test("leaves the Grok banner script off the store's own domains", () => {
+  for (const host of ["trycairn.vercel.app", "fieldnotepdf-abc123-team.vercel.app", "cairn.example.com"]) {
+    const out = injectGrokPwaHead("<html><head></head><body></body></html>", { appName: "Cairn", host });
+    assert.doesNotMatch(out, /extensions\.js/, host);
+  }
+  const grok = injectGrokPwaHead("<html><head></head><body></body></html>", { appName: "Demo", host: "demo.grok.me" });
+  assert.match(grok, /extensions\.js/);
 });
 
 test("does not duplicate the extensions script", () => {
@@ -395,7 +410,7 @@ test("is idempotent", () => {
 });
 
 test("uses the app name in the injected title tag", () => {
-  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Wild Race" });
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Wild Race", cwd: BLANK_CWD });
   assert.match(out, /apple-mobile-web-app-title" content="Wild Race"/);
 });
 

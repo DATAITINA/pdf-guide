@@ -237,7 +237,28 @@ export function grokXCreatorHeadTags(creator = readXCreator(), creatorId = readX
   ];
 }
 
-/** Platform "Created with Grok" banner — injected into every HTML document. */
+/**
+ * The "Created with Grok" banner only belongs on Grok-hosted addresses. On
+ * the store's own domains (trycairn.vercel.app etc.) it is an extra
+ * third-party script customers don't need. No host (tests/sandbox) keeps it.
+ */
+export function wantsGrokBanner(hostHeader) {
+  const host = String(hostHeader ?? "")
+    .split(",")[0]
+    .trim()
+    .split(":")[0]
+    .toLowerCase();
+  if (!host) return true;
+  return (
+    host.endsWith(".grok.me") ||
+    host === "grok.com" ||
+    host.endsWith(".grok.com") ||
+    host === "app-builder-testing.com" ||
+    host.endsWith(".app-builder-testing.com")
+  );
+}
+
+/** Platform "Created with Grok" banner — injected on Grok-hosted documents only. */
 export function grokExtensionsHeadTags(projectId = readGrokProjectId()) {
   const id = escapeHtml(projectId);
   const tags = [];
@@ -457,7 +478,9 @@ export function injectGrokPwaHead(html, ctx = {}) {
     grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
   );
 
-  if (!next.includes("/grok-app-builder/extensions.js")) {
+  if (!wantsGrokBanner(host)) {
+    // Store's own domain: no Grok banner script.
+  } else if (!next.includes("/grok-app-builder/extensions.js")) {
     missing.push(...grokExtensionsHeadTags(projectId));
   } else if (projectId && !next.includes('name="grok-project-id"')) {
     missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);

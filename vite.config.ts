@@ -1,5 +1,6 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { copyFileSync, existsSync, readdirSync } from "node:fs";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -142,6 +143,27 @@ function authPopupPlugin(): Plugin {
   };
 }
 
+/**
+ * PGLite loads pglite.data / *.wasm from next to its own module. The server
+ * bundle copies the module but not those files, so any deploy without
+ * DATABASE_URL (Vercel previews, `vite preview`) crashed with ENOENT. Copy
+ * them next to every bundled copy of the PGLite module after the build.
+ */
+function copyPgliteAssets(serverDir: string) {
+  const pgliteDist = dirname(createRequire(import.meta.url).resolve("@electric-sql/pglite"));
+  const assets = ["pglite.data", "pglite.wasm", "initdb.wasm"].filter((f) => existsSync(join(pgliteDist, f)));
+  const visit = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) visit(full);
+      else if (/^electric-sql__pglite.*\.mjs$|^pglite.*\.m?js$/.test(entry.name)) {
+        for (const asset of assets) copyFileSync(join(pgliteDist, asset), join(dir, asset));
+      }
+    }
+  };
+  if (existsSync(serverDir)) visit(serverDir);
+}
+
 // `0.0.0.0:8080` is the live-preview contract — don't change host/port.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
@@ -175,6 +197,13 @@ export default defineConfig(({ command, isPreview }) => ({
             // manifest + head-tag middleware). Nitro v3 defaults serverDir to
             // false, so removing this silently unwires /?install=1 on deploys.
             serverDir: "./server",
+            // A module adds this hook next to the Vercel preset's own "compiled" hook
+            // (which writes .vercel/output/config.json). A plain `hooks` entry would replace it.
+            modules: [
+              (nitroApp) => {
+                nitroApp.hooks.hook("compiled", () => copyPgliteAssets(nitroApp.options.output.serverDir));
+              },
+            ],
           }),
         ]
       : []),

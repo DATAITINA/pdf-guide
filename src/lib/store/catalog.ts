@@ -4,6 +4,7 @@ import { getSql } from "@/lib/db";
 import { env } from "@/lib/env.server";
 import { mapCard, mapCategory, mapDetail, mapFaq, mapSettings, mapTestimonial } from "./map";
 import { DEFAULT_SETTINGS } from "./types";
+import { guardEnv, testPurchaseAllowed } from "./payment-guard";
 
 const PRODUCT_SELECT = `
   p.id, p.title, p.slug, p.subtitle, p.short_description, p.full_description,
@@ -175,6 +176,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       }>`select * from faqs where published = true order by sort_order`
     ).map(mapFaq);
 
+    const { getRequestHost } = await import("@tanstack/react-start/server");
     return {
       settings,
       product,
@@ -184,12 +186,14 @@ export const getProductBySlug = createServerFn({ method: "GET" })
         paystackConfigured: Boolean(env("PAYSTACK_SECRET_KEY")),
         emailConfigured: Boolean(env("RESEND_API_KEY") && env("RESEND_FROM_EMAIL")),
         bankConfigured: Boolean(settings.bankName && settings.accountName && settings.accountNumber),
+        // Only true on a developer's own machine; always false on Vercel.
+        testPurchase: testPurchaseAllowed(getRequestHost(), guardEnv(env("PAYSTACK_SECRET_KEY"))),
       },
     };
   });
 
 function emptyPayments() {
-  return { paystackConfigured: false, emailConfigured: false, bankConfigured: false };
+  return { paystackConfigured: false, emailConfigured: false, bankConfigured: false, testPurchase: false };
 }
 
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {

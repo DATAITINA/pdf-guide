@@ -3,23 +3,27 @@ import { Slot } from "@radix-ui/react-slot";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+/** The one button style. Every size is at least 48px tall for thumbs. */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 select-none",
+  [
+    "inline-flex select-none items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap",
+    "transition-[background-color,border-color,color,transform] duration-150 ease-out",
+    "active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
+  ].join(" "),
   {
     variants: {
       variant: {
-        primary:
-          "bg-accent text-accent-fg hover:bg-accent-hover shadow-[0_1px_0_rgb(255_255_255_/0.12)_inset]",
-        ink: "bg-ink text-paper hover:bg-ink/90",
-        outline:
-          "border border-line bg-transparent text-ink hover:bg-paper-2",
+        primary: "bg-accent text-accent-fg hover:bg-accent-hover",
+        secondary: "border border-field bg-surface text-ink hover:border-ink hover:bg-paper-2",
+        outline: "border border-field bg-surface text-ink hover:border-ink hover:bg-paper-2",
         ghost: "text-ink hover:bg-paper-2",
+        ink: "bg-ink text-paper hover:bg-ink/90",
         danger: "bg-danger text-paper hover:bg-danger/90",
       },
       size: {
-        sm: "h-10 px-3.5 text-sm rounded-[10px]",
-        md: "h-12 px-5 text-[15px] rounded-[12px]",
-        lg: "h-13 min-h-12 px-6 text-base rounded-[14px]",
+        sm: "min-h-12 px-4 text-sm",
+        md: "min-h-12 px-5 text-base",
+        lg: "min-h-14 px-6 text-base",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },

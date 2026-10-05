@@ -90,8 +90,10 @@ test("only a divergence warns the smoke verdict", () => {
   }
 });
 
-test("the build side resolves the template's shipped app-env", () => {
-  assert.equal(buildAuthEnabled(projectRoot(), {}), false);
+test("the build side resolves this project's app-env (publisher sign-in on)", () => {
+  // Cairn ships with sign-in on (no VITE_AUTH_ENABLED in .grok/app-env.json) so the publisher can log in.
+  assert.equal(buildAuthEnabled(projectRoot(), {}), true);
+  assert.equal(buildAuthEnabled(projectRoot(), { VITE_AUTH_ENABLED: "false" }), false);
   assert.equal(buildAuthEnabled(projectRoot(), { VITE_AUTH_ENABLED: "true" }), true);
 });
 
@@ -99,7 +101,8 @@ test("the CLI reports rather than silently passing when run via a symlink", asyn
   // A check whose exit code is the whole signal must never no-op to 0 because
   // process.argv[1] came in through a symlinked path.
   const link = join(mkdtempSync(join(tmpdir(), "auth-invariant-link-")), "scripts");
-  symlinkSync(join(projectRoot(), "scripts"), link);
+  // "junction" lets Windows link a directory without admin rights; POSIX ignores it.
+  symlinkSync(join(projectRoot(), "scripts"), link, "junction");
   const error = await promisify(execFile)(process.execPath, [
     join(link, "check-auth-invariant.mjs"),
     "--dev-url",

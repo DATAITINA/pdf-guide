@@ -1,12 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { getSiteSettings } from "@/lib/store/catalog";
 import { PageShell } from "@/components/store/layout";
+import { PersonalGuideCta } from "@/components/store/blocks";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/contact")({
   loader: () => getSiteSettings(),
   component: Contact,
   head: ({ loaderData }) => ({
-    meta: [{ title: `Contact — ${loaderData?.storeName ?? "Cairn"}` }],
+    meta: [
+      { title: `Contact — ${loaderData?.storeName ?? "Cairn"}` },
+      { name: "description", content: "Message Cairn on WhatsApp, or send an email." },
+    ],
   }),
 });
 
@@ -15,23 +21,52 @@ function Contact() {
   const wa = settings.whatsapp.replace(/\D/g, "");
   return (
     <PageShell settings={settings}>
-      <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <p className="text-xs tracking-[0.18em] text-accent uppercase">Contact</p>
-        <h1 className="mt-2 font-display text-4xl">How to reach us</h1>
-        <div className="mt-8 space-y-3 text-[17px] leading-relaxed">
-          <p>Email · {settings.supportEmail || "Add a support email in Settings"}</p>
-          {settings.contactPhone ? <p>Phone · {settings.contactPhone}</p> : null}
+      <section className="page-narrow section-sm">
+        <p className="eyebrow">Contact</p>
+        <h1 className="h-section mt-3 text-ink">How to reach us</h1>
+        <p className="lead mt-4">WhatsApp is the quickest way to reach us.</p>
+
+        <div className="mt-10 space-y-4">
           {wa ? (
-            <p>
-              WhatsApp ·{" "}
-              <a className="underline" href={`https://wa.me/${wa}`}>
-                Message {settings.storeName}
+            <div className="card p-6">
+              <h2 className="flex items-center gap-3 font-sans text-lg font-semibold tracking-normal text-ink">
+                <MessageCircle className="size-5 text-accent" aria-hidden /> WhatsApp
+              </h2>
+              <p className="mt-2 text-muted">For questions, help with an order, or to talk about a personal guide.</p>
+              <Button asChild size="lg" className="mt-5 w-full sm:w-auto">
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer">
+                  Message us on WhatsApp
+                </a>
+              </Button>
+            </div>
+          ) : null}
+
+          {settings.supportEmail ? (
+            <div className="card p-6">
+              <h2 className="flex items-center gap-3 font-sans text-lg font-semibold tracking-normal text-ink">
+                <Mail className="size-5 text-accent" aria-hidden /> Email
+              </h2>
+              <p className="mt-2 text-muted">Include your order reference if your message is about a purchase.</p>
+              <a href={`mailto:${settings.supportEmail}`} className="link link-tap mt-2 break-all">
+                {settings.supportEmail}
               </a>
-            </p>
-          ) : (
-            <p className="text-muted">WhatsApp number can be added in publisher settings.</p>
-          )}
+            </div>
+          ) : null}
+
+          {settings.contactPhone ? (
+            <div className="card p-6">
+              <h2 className="flex items-center gap-3 font-sans text-lg font-semibold tracking-normal text-ink">
+                <Phone className="size-5 text-accent" aria-hidden /> Phone
+              </h2>
+              <a href={`tel:${settings.contactPhone.replace(/[^\d+]/g, "")}`} className="link link-tap mt-2">
+                {settings.contactPhone}
+              </a>
+            </div>
+          ) : null}
         </div>
+      </section>
+      <section className="page pb-16 md:pb-24">
+        <PersonalGuideCta />
       </section>
     </PageShell>
   );

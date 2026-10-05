@@ -108,7 +108,7 @@ export type OrderRow = {
 export const DEFAULT_SETTINGS: StoreSettings = {
   storeName: "Cairn",
   tagline: "Small steps, clearly marked.",
-  supportEmail: "hello@cairn.guide",
+  supportEmail: "thedaviditina@gmail.com",
   contactPhone: "",
   whatsapp: "",
   currency: "NGN",
