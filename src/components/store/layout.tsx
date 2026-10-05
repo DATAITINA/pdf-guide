@@ -1,192 +1,168 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { UserButton } from "@/lib/auth/gates";
 import type { StoreSettings } from "@/lib/store/types";
+import { Button } from "@/components/ui/button";
+import { RequestGuideLink } from "./blocks";
 
 const navLinks = [
-  { to: "/" as const, label: "Home" },
-  { to: "/guides" as const, label: "Guides" },
+  { to: "/guides" as const, label: "Ready-made guides" },
   { to: "/about" as const, label: "About" },
   { to: "/faq" as const, label: "FAQ" },
+  { to: "/contact" as const, label: "Contact" },
 ];
+
+function Brand({ settings, onClick }: { settings: StoreSettings; onClick?: () => void }) {
+  return (
+    <Link
+      to="/"
+      aria-label={`${settings.storeName} home`}
+      className="flex min-h-12 min-w-0 items-center gap-3 rounded-md"
+      onClick={onClick}
+    >
+      <img src="/cairn-mark.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate font-display text-2xl leading-none text-ink">{settings.storeName}</span>
+        <span className="mt-1 hidden text-xs leading-none font-medium text-muted md:block">
+          Small steps, clearly marked
+        </span>
+      </span>
+    </Link>
+  );
+}
 
 export function StoreHeader({ settings }: { settings: StoreSettings }) {
   const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link
-          to="/"
-          aria-label={`${settings.storeName} home`}
-          className="flex min-w-0 items-center gap-3"
-          onClick={() => setOpen(false)}
-        >
-          <img src="/cairn-mark.svg" alt="" aria-hidden="true" width={36} height={36} className="size-9 shrink-0" />
-          <span className="flex min-w-0 flex-col leading-none">
-            <span className="truncate font-display text-[1.4rem] tracking-[-0.045em]">
-              {settings.storeName}
-            </span>
-            <span className="mt-1 text-[9px] font-semibold tracking-[0.16em] text-muted uppercase">
-              Small steps, clearly marked
-            </span>
-          </span>
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/95 backdrop-blur-md">
+      <div className="page flex h-16 items-center justify-between gap-3">
+        <Brand settings={settings} onClick={close} />
 
-        <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="rounded-[10px] px-3 py-2 text-ink/90 transition-colors hover:bg-paper-2 hover:text-ink"
-              activeOptions={{ exact: link.to === "/" }}
+              className="inline-flex min-h-12 items-center rounded-md px-3 text-sm font-medium text-ink transition-colors hover:bg-paper-2"
+              activeProps={{ className: "text-accent" }}
             >
               {link.label}
             </Link>
           ))}
-          <Link
-            to="/guides"
-            search={{ q: "" }}
-            className="rounded-[10px] px-3 py-2 text-ink/90 transition-colors hover:bg-paper-2"
-            aria-label="Search guides"
-          >
-            <Search className="size-4" />
-          </Link>
-          <Link
-            to="/guides"
-            className="ml-1 rounded-[10px] bg-accent px-3.5 py-2 text-accent-fg transition-colors hover:bg-accent-hover"
-          >
-            Explore
-          </Link>
+          <Button asChild size="sm" className="ml-2">
+            <RequestGuideLink>Request a guide</RequestGuideLink>
+          </Button>
         </nav>
 
-        <div className="flex items-center gap-2 md:hidden">
-          <Link
-            to="/guides"
-            className="grid size-12 place-items-center rounded-[12px] text-ink transition-colors hover:bg-paper-2"
-            aria-label="Search guides"
-          >
-            <Search className="size-5" />
-          </Link>
+        <div className="flex items-center gap-1 lg:hidden">
+          <Button asChild size="sm" className="px-3.5">
+            <RequestGuideLink>
+              <span onClick={close}>Request a guide</span>
+            </RequestGuideLink>
+          </Button>
           <button
             type="button"
-            className="grid size-12 place-items-center rounded-[12px] text-ink transition-colors hover:bg-paper-2"
+            className="grid size-12 place-items-center rounded-md text-ink transition-colors hover:bg-paper-2"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            {open ? <X className="size-6" /> : <Menu className="size-6" />}
           </button>
         </div>
       </div>
 
       {open ? (
-        <div
-          id="mobile-nav"
-          className="border-t border-line bg-paper md:hidden"
-          role="dialog"
-          aria-label="Mobile navigation"
-        >
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="rounded-[12px] px-4 py-3 text-base font-medium transition-colors hover:bg-paper-2"
-                activeOptions={{ exact: link.to === "/" }}
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
+        <nav id="mobile-nav" className="animate-fade-in border-t border-line bg-paper lg:hidden" aria-label="Main">
+          <ul className="page flex flex-col py-2">
+            <li>
+              <Link to="/" className="flex min-h-14 items-center text-lg font-medium" onClick={close}>
+                Home
               </Link>
+            </li>
+            {navLinks.map((link) => (
+              <li key={link.to} className="border-t border-line/70">
+                <Link to={link.to} className="flex min-h-14 items-center text-lg font-medium" onClick={close}>
+                  {link.label}
+                </Link>
+              </li>
             ))}
-            <Link
-              to="/guides"
-              className="mt-2 rounded-[12px] bg-accent px-4 py-3 text-center text-base font-medium text-accent-fg"
-              onClick={() => setOpen(false)}
-            >
-              Explore guides
-            </Link>
-            <Link
-              to="/contact"
-              className="rounded-[12px] px-4 py-3 text-base text-muted transition-colors hover:bg-paper-2"
-              onClick={() => setOpen(false)}
-            >
-              Contact
-            </Link>
-          </nav>
-        </div>
+          </ul>
+        </nav>
       ) : null}
     </header>
   );
 }
 
+const footerLink = "inline-flex min-h-12 items-center text-base text-ink transition-colors hover:text-accent";
+
 export function StoreFooter({ settings }: { settings: StoreSettings }) {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-20 border-t border-line bg-paper-2/60" data-sticky-hide>
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
-        <div className="md:col-span-2">
+    <footer className="border-t border-line bg-paper-2/60" data-sticky-hide>
+      <div className="page grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:py-16">
+        <div>
           <div className="flex items-center gap-3">
             <img src="/cairn-mark.svg" alt="" aria-hidden="true" width={32} height={32} className="size-8 shrink-0" />
-            <p className="font-display text-2xl tracking-tight">{settings.storeName}</p>
+            <p className="font-display text-2xl text-ink">{settings.storeName}</p>
           </div>
-          <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">{settings.tagline}</p>
-          <p className="mt-4 max-w-sm text-base leading-relaxed text-muted">
-            Practical digital guides you can download and keep — written for ordinary days, not perfect ones.
+          <p className="mt-4 max-w-sm text-muted">
+            Practical guides for home and work. Ask for one made for you, with check-ins on WhatsApp, or buy one
+            that’s already written.
           </p>
+          <Button asChild variant="secondary" className="mt-6">
+            <RequestGuideLink>Request a personal guide</RequestGuideLink>
+          </Button>
         </div>
         <div>
-          <p className="text-[0.8125rem] font-semibold tracking-[0.16em] text-subtle uppercase">Explore</p>
-          <ul className="mt-3 space-y-1 text-base">
+          <p className="eyebrow text-subtle">Explore</p>
+          <ul className="mt-2">
             <li>
-              <Link to="/" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
-                Home
+              <Link to="/guides" className={footerLink}>
+                Ready-made guides
               </Link>
             </li>
             <li>
-              <Link to="/guides" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
-                All guides
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
+              <Link to="/about" className={footerLink}>
                 About
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
-                Contact
+              <Link to="/faq" className={footerLink}>
+                FAQ
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
-                FAQ
+              <Link to="/contact" className={footerLink}>
+                Contact
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <p className="text-[0.8125rem] font-semibold tracking-[0.16em] text-subtle uppercase">Policies</p>
-          <ul className="mt-3 space-y-1 text-base">
+          <p className="eyebrow text-subtle">Policies</p>
+          <ul className="mt-2">
             <li>
-              <Link to="/refund" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
+              <Link to="/refund" className={footerLink}>
                 Refund policy
               </Link>
             </li>
             <li>
-              <Link to="/privacy" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
+              <Link to="/privacy" className={footerLink}>
                 Privacy policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
+              <Link to="/terms" className={footerLink}>
                 Terms
               </Link>
             </li>
             <li>
-              <Link to="/admin" className="inline-flex min-h-11 items-center transition-colors hover:text-accent">
+              <Link to="/admin" className={footerLink}>
                 Publisher
               </Link>
             </li>
@@ -194,7 +170,7 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
         </div>
       </div>
       <div className="border-t border-line/80">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-muted sm:px-6">
+        <div className="page flex min-h-16 flex-wrap items-center justify-between gap-3 py-3 text-sm text-muted">
           <p>
             © {year} {settings.storeName}. Small steps, clearly marked.
           </p>
@@ -205,17 +181,19 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
   );
 }
 
-export function PageShell({
-  settings,
-  children,
-}: {
-  settings: StoreSettings;
-  children: React.ReactNode;
-}) {
+export function PageShell({ settings, children }: { settings: StoreSettings; children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-paper text-ink">
+    <div className="flex min-h-dvh flex-col bg-paper text-ink">
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-md bg-accent px-4 py-3 text-accent-fg focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+      >
+        Skip to content
+      </a>
       <StoreHeader settings={settings} />
-      <main>{children}</main>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
       <StoreFooter settings={settings} />
     </div>
   );
