@@ -78,7 +78,7 @@ export const startCheckout = createServerFn({ method: "POST" })
     const pricing = await resolveVoucher(data.voucherCode, product.id, Number(product.price_kobo));
     const sql = await getSql();
     const orderId = newId("ord");
-    const reference = `FN-${Date.now().toString(36)}-${newId().slice(0, 8)}`.toUpperCase();
+    const reference = `CRN-${Date.now().toString(36)}-${newId().slice(0, 8)}`.toUpperCase();
     const method = data.method;
     const paystackReady = Boolean(env("PAYSTACK_SECRET_KEY"));
 
