@@ -21,7 +21,11 @@ function Privacy() {
             {settings.storeName} collects the name, email and optional phone number you enter at checkout so we can create your order, confirm payment and send a download link.
           </p>
           <p>
-            Payment card details are processed by Paystack. We do not store full card numbers. Bank-transfer receipts are stored privately so the publisher can confirm payment, and are not shown on the public site.
+            When you ask for a personal guide, we keep what you tell us, your WhatsApp number, and your name and
+            email if you give them, so we can reply and check in with you. We don’t share them with anyone else.
+          </p>
+          <p>
+            If card payment is offered at checkout, card details are processed by Paystack. We do not store full card numbers. Bank-transfer receipts are stored privately so the publisher can confirm payment, and are not shown on the public site.
           </p>
           <p>
             PDF files are kept in private storage. A download link is issued only after an order is marked paid. We keep order records so we can restore access if a link expires.

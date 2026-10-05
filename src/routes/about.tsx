@@ -21,7 +21,7 @@ function About() {
           {settings.storeName} publishes practical digital PDF guides for everyday life — parenting, money, work and home. The writing is meant to be used, not merely admired: short enough to finish, specific enough to try the same day.
         </p>
         <p className="mt-4 text-[17px] leading-relaxed text-muted">
-          Guides are delivered as instant downloads after payment is confirmed. Store details, bank account information and contact addresses can be updated by the publisher without changing the site itself.
+          Guides are delivered as instant downloads after payment is confirmed.
         </p>
       </section>
     </PageShell>
