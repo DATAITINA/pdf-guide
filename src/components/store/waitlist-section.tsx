@@ -156,7 +156,7 @@ export function WaitlistSection({ whatsappLink }: { whatsappLink?: string | null
               ) : (
                 <button
                   type="button"
-                  className="link link-tap -my-2 no-underline"
+                  className="link link-tap no-underline"
                   onClick={() => setShowEmail(true)}
                 >
                   <Plus className="size-4" aria-hidden /> Add email (optional)
