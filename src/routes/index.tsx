@@ -94,17 +94,18 @@ function Home() {
 
       {/* Who is behind Cairn */}
       <section className="page section">
-        <div className="grid items-center gap-8 md:grid-cols-[auto_1fr] md:gap-12">
+        {/* Phone: photo and text centred in one column; side by side from md */}
+        <div className="grid items-center justify-items-center gap-6 text-center md:grid-cols-[auto_1fr] md:justify-items-start md:gap-12 md:text-left">
           <img
             src={OWNER.photo.src}
             srcSet={OWNER.photo.srcSet}
-            sizes="(min-width: 768px) 192px, 128px"
+            sizes="(min-width: 768px) 192px, 144px"
             alt={OWNER.photo.alt}
             width={480}
             height={480}
             loading="lazy"
             decoding="async"
-            className="size-32 rounded-full object-cover shadow-card md:size-48"
+            className="size-36 rounded-full object-cover shadow-card md:size-48"
           />
           <div className="max-w-2xl">
             <p className="eyebrow">Who’s behind Cairn</p>
@@ -122,8 +123,8 @@ function Home() {
       <section className="border-t border-line">
         <div className="page section">
           <SectionHeading eyebrow="Two options" title="Two ways to get a guide" />
-          <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
-            <div className="card flex flex-col p-6 sm:p-8">
+          <div className="mt-8 grid gap-4 md:mt-10 md:grid-cols-2 md:gap-6">
+            <div className="card flex flex-col p-5 sm:p-8">
               <p className="eyebrow">Made for you</p>
               <h3 className="h-card mt-3 text-ink">A personal guide, with check-ins</h3>
               <p className="mt-3 text-muted">
@@ -137,7 +138,7 @@ function Home() {
                 Tell us what you need <ArrowRight className="size-4" aria-hidden />
               </a>
             </div>
-            <div className="card flex flex-col p-6 sm:p-8">
+            <div className="card flex flex-col p-5 sm:p-8">
               <p className="eyebrow">Ready-made</p>
               <h3 className="h-card mt-3 text-ink">A guide that’s already written</h3>
               <p className="mt-3 text-muted">
@@ -158,7 +159,7 @@ function Home() {
 
       {/* Example guides: real products only */}
       {examples.length > 0 ? (
-        <section className="page pb-16 md:pb-24">
+        <section className="page pb-12 md:pb-24">
           <div className="flex items-end justify-between gap-4">
             <SectionHeading
               eyebrow="Ready-made"
@@ -169,7 +170,7 @@ function Home() {
               See all guides
             </Link>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 md:mt-10 lg:grid-cols-4">
             {examples.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -185,7 +186,7 @@ function Home() {
         <div className="page section">
           <p className="eyebrow text-accent-fg/85">How it works</p>
           <h2 className="h-section mt-3">Three simple steps</h2>
-          <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+          <ol className="relative mt-8 grid gap-8 md:mt-12 md:grid-cols-3">
             <span
               aria-hidden
               className="absolute top-6 right-[calc((100%_-_4rem)/3_-_1.5rem)] left-6 hidden border-t-2 border-dotted border-accent-fg/35 md:block"
@@ -237,7 +238,7 @@ function Step({ n, title, last, children }: { n: number; title: string; last?: b
     <li className="relative flex gap-5 md:flex-col md:gap-4">
       {/* Phone: dotted line down to the next step only, so nothing trails after step 3 */}
       {last ? null : (
-        <span aria-hidden className="absolute top-12 -bottom-10 left-6 border-l-2 border-dotted border-accent-fg/35 md:hidden" />
+        <span aria-hidden className="absolute top-12 -bottom-8 left-6 border-l-2 border-dotted border-accent-fg/35 md:hidden" />
       )}
       <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-[45%_55%_50%_50%/55%_50%_50%_45%] bg-accent-fg font-display text-xl text-accent">
         {n}

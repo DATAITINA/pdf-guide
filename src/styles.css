@@ -201,10 +201,10 @@
     }
   }
   .section {
-    padding-block: 4rem;
+    padding-block: 3rem;
   }
   .section-sm {
-    padding-block: 3rem;
+    padding-block: 2.5rem;
   }
   @media (min-width: 768px) {
     .section {

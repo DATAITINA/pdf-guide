@@ -25,7 +25,7 @@ function About() {
         <p className="eyebrow">About</p>
         <h1 className="h-section mt-3 text-ink">Practical guides, and someone in your corner</h1>
 
-        <figure className="mt-10 flex flex-col gap-6 sm:flex-row sm:items-center">
+        <figure className="mt-8 flex flex-col items-center gap-6 text-center sm:mt-10 sm:flex-row sm:text-left">
           <img
             src={OWNER.photo.src}
             srcSet={OWNER.photo.srcSet}
