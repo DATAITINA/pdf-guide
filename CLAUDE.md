@@ -39,7 +39,9 @@ The story while you wait is a doorway: short, accurate, labelled as an example, 
 - Running-cost ceiling while testing: **under $20/month**, all-in.
 - AI: **Vercel AI Gateway** (not a direct Anthropic key).
 - WhatsApp: **not set up yet** (no Meta Business / Cloud API). M3 starts with drafts the owner approves; sending waits on Meta setup.
-- Production env vars today: `DATABASE_URL` (production only) and `DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS` (to be removed). Paystack and Resend are not configured, so ready-made guides are bank transfer only.
+- Production env vars today: `DATABASE_URL` only (production target). Paystack and Resend are not configured, so ready-made guides are bank transfer only.
+- Admin: email + password sign-in only, sign-up disabled, password changed in Admin → Settings. Never put a password or secret in this public repo; an old admin password is already in git history and must never be reused.
+- Vercel plan: Hobby is non-commercial only, and Cairn sells guides. Decision on Pro is pending.
 
 ## Stack
 
