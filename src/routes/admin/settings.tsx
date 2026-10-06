@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth/client";
 import { getAdminSettings, saveAdminSettings } from "@/lib/store/admin";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/input";
@@ -161,6 +162,87 @@ function SettingsPage() {
       <Button type="button" className="mt-8" onClick={() => void onSave()}>
         Save settings
       </Button>
+
+      <ChangePassword />
     </main>
+  );
+}
+
+const MIN_PASSWORD_LENGTH = 12; // matches emailAndPassword.minPasswordLength in auth/server.ts
+
+function ChangePassword() {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (next.length < MIN_PASSWORD_LENGTH) {
+      toast.error(`Use at least ${MIN_PASSWORD_LENGTH} characters.`);
+      return;
+    }
+    if (next !== confirm) {
+      toast.error("The new passwords don't match.");
+      return;
+    }
+    setBusy(true);
+    try {
+      // Signs out every other device, so anyone using the old password is kicked out.
+      const { error } = await authClient.changePassword({
+        currentPassword: current,
+        newPassword: next,
+        revokeOtherSessions: true,
+      });
+      if (error) {
+        toast.error(error.message ?? "Could not change your password.");
+        return;
+      }
+      setCurrent("");
+      setNext("");
+      setConfirm("");
+      toast.success("Password changed. Other devices have been signed out.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={(e) => void onSubmit(e)} className="mt-12 max-w-md border-t border-line pt-8">
+      <h2 className="font-display text-2xl">Change password</h2>
+      <p className="mt-1 text-sm text-muted">This also signs you out on every other device.</p>
+      <div className="mt-4 grid gap-4">
+        <Field label="Current password">
+          <Input
+            type="password"
+            autoComplete="current-password"
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="New password" hint={`At least ${MIN_PASSWORD_LENGTH} characters.`}>
+          <Input
+            type="password"
+            autoComplete="new-password"
+            value={next}
+            onChange={(e) => setNext(e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="New password again">
+          <Input
+            type="password"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+          />
+        </Field>
+      </div>
+      <Button type="submit" className="mt-6" disabled={busy}>
+        {busy ? "Changing…" : "Change password"}
+      </Button>
+    </form>
   );
 }
