@@ -31,13 +31,18 @@ import { Route as CheckoutVerifyRouteImport } from './routes/checkout/verify'
 import { Route as DownloadTokenRouteImport } from './routes/download/$token'
 import { Route as GuidesIndexRouteImport } from './routes/guides/index'
 import { Route as GuidesSlugRouteImport } from './routes/guides/$slug'
+import { Route as GuidesPersonalRouteImport } from './routes/guides/personal'
+import { Route as StoriesIndexRouteImport } from './routes/stories/index'
+import { Route as StoriesSlugRouteImport } from './routes/stories/$slug'
 import { Route as AdminProductIdRouteImport } from './routes/admin/product.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiCoversProductIdRouteImport } from './routes/api/covers/$productId'
 import { Route as ApiPaystackWebhookRouteImport } from './routes/api/paystack/webhook'
 import { Route as CheckoutTransferOrderIdRouteImport } from './routes/checkout/transfer.$orderId'
+import { Route as ReadSlugIssueRouteImport } from './routes/read/$slug/$issue'
 import { Route as ApiAdminProofOrderIdRouteImport } from './routes/api/admin/proof.$orderId'
 import { Route as ApiFilesDownloadTokenRouteImport } from './routes/api/files/download.$token'
+import { Route as OutSlugIssueProviderRouteImport } from './routes/out/$slug/$issue/$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -149,6 +154,21 @@ const GuidesSlugRoute = GuidesSlugRouteImport.update({
   path: '/guides/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesPersonalRoute = GuidesPersonalRouteImport.update({
+  id: '/guides/personal',
+  path: '/guides/personal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoriesIndexRoute = StoriesIndexRouteImport.update({
+  id: '/stories/',
+  path: '/stories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoriesSlugRoute = StoriesSlugRouteImport.update({
+  id: '/stories/$slug',
+  path: '/stories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminProductIdRoute = AdminProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
@@ -174,6 +194,11 @@ const CheckoutTransferOrderIdRoute = CheckoutTransferOrderIdRouteImport.update({
   path: '/checkout/transfer/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReadSlugIssueRoute = ReadSlugIssueRouteImport.update({
+  id: '/read/$slug/$issue',
+  path: '/read/$slug/$issue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminProofOrderIdRoute = ApiAdminProofOrderIdRouteImport.update({
   id: '/api/admin/proof/$orderId',
   path: '/api/admin/proof/$orderId',
@@ -182,6 +207,11 @@ const ApiAdminProofOrderIdRoute = ApiAdminProofOrderIdRouteImport.update({
 const ApiFilesDownloadTokenRoute = ApiFilesDownloadTokenRouteImport.update({
   id: '/api/files/download/$token',
   path: '/api/files/download/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutSlugIssueProviderRoute = OutSlugIssueProviderRouteImport.update({
+  id: '/out/$slug/$issue/$provider',
+  path: '/out/$slug/$issue/$provider',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -206,15 +236,20 @@ export interface FileRoutesByFullPath {
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
   '/guides/$slug': typeof GuidesSlugRoute
+  '/guides/personal': typeof GuidesPersonalRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/guides/': typeof GuidesIndexRoute
+  '/stories/': typeof StoriesIndexRoute
   '/admin/product/$id': typeof AdminProductIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/covers/$productId': typeof ApiCoversProductIdRoute
   '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
   '/checkout/transfer/$orderId': typeof CheckoutTransferOrderIdRoute
+  '/read/$slug/$issue': typeof ReadSlugIssueRoute
   '/api/admin/proof/$orderId': typeof ApiAdminProofOrderIdRoute
   '/api/files/download/$token': typeof ApiFilesDownloadTokenRoute
+  '/out/$slug/$issue/$provider': typeof OutSlugIssueProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,15 +271,20 @@ export interface FileRoutesByTo {
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
   '/guides/$slug': typeof GuidesSlugRoute
+  '/guides/personal': typeof GuidesPersonalRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/guides': typeof GuidesIndexRoute
+  '/stories': typeof StoriesIndexRoute
   '/admin/product/$id': typeof AdminProductIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/covers/$productId': typeof ApiCoversProductIdRoute
   '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
   '/checkout/transfer/$orderId': typeof CheckoutTransferOrderIdRoute
+  '/read/$slug/$issue': typeof ReadSlugIssueRoute
   '/api/admin/proof/$orderId': typeof ApiAdminProofOrderIdRoute
   '/api/files/download/$token': typeof ApiFilesDownloadTokenRoute
+  '/out/$slug/$issue/$provider': typeof OutSlugIssueProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -268,15 +308,20 @@ export interface FileRoutesById {
   '/checkout/verify': typeof CheckoutVerifyRoute
   '/download/$token': typeof DownloadTokenRoute
   '/guides/$slug': typeof GuidesSlugRoute
+  '/guides/personal': typeof GuidesPersonalRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/guides/': typeof GuidesIndexRoute
+  '/stories/': typeof StoriesIndexRoute
   '/admin/product/$id': typeof AdminProductIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/covers/$productId': typeof ApiCoversProductIdRoute
   '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
   '/checkout/transfer/$orderId': typeof CheckoutTransferOrderIdRoute
+  '/read/$slug/$issue': typeof ReadSlugIssueRoute
   '/api/admin/proof/$orderId': typeof ApiAdminProofOrderIdRoute
   '/api/files/download/$token': typeof ApiFilesDownloadTokenRoute
+  '/out/$slug/$issue/$provider': typeof OutSlugIssueProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -301,15 +346,20 @@ export interface FileRouteTypes {
     | '/checkout/verify'
     | '/download/$token'
     | '/guides/$slug'
+    | '/guides/personal'
+    | '/stories/$slug'
     | '/admin/'
     | '/guides/'
+    | '/stories/'
     | '/admin/product/$id'
     | '/api/auth/$'
     | '/api/covers/$productId'
     | '/api/paystack/webhook'
     | '/checkout/transfer/$orderId'
+    | '/read/$slug/$issue'
     | '/api/admin/proof/$orderId'
     | '/api/files/download/$token'
+    | '/out/$slug/$issue/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -331,15 +381,20 @@ export interface FileRouteTypes {
     | '/checkout/verify'
     | '/download/$token'
     | '/guides/$slug'
+    | '/guides/personal'
+    | '/stories/$slug'
     | '/admin'
     | '/guides'
+    | '/stories'
     | '/admin/product/$id'
     | '/api/auth/$'
     | '/api/covers/$productId'
     | '/api/paystack/webhook'
     | '/checkout/transfer/$orderId'
+    | '/read/$slug/$issue'
     | '/api/admin/proof/$orderId'
     | '/api/files/download/$token'
+    | '/out/$slug/$issue/$provider'
   id:
     | '__root__'
     | '/'
@@ -362,15 +417,20 @@ export interface FileRouteTypes {
     | '/checkout/verify'
     | '/download/$token'
     | '/guides/$slug'
+    | '/guides/personal'
+    | '/stories/$slug'
     | '/admin/'
     | '/guides/'
+    | '/stories/'
     | '/admin/product/$id'
     | '/api/auth/$'
     | '/api/covers/$productId'
     | '/api/paystack/webhook'
     | '/checkout/transfer/$orderId'
+    | '/read/$slug/$issue'
     | '/api/admin/proof/$orderId'
     | '/api/files/download/$token'
+    | '/out/$slug/$issue/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -389,13 +449,18 @@ export interface RootRouteChildren {
   CheckoutVerifyRoute: typeof CheckoutVerifyRoute
   DownloadTokenRoute: typeof DownloadTokenRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
+  GuidesPersonalRoute: typeof GuidesPersonalRoute
+  StoriesSlugRoute: typeof StoriesSlugRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
+  StoriesIndexRoute: typeof StoriesIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiCoversProductIdRoute: typeof ApiCoversProductIdRoute
   ApiPaystackWebhookRoute: typeof ApiPaystackWebhookRoute
   CheckoutTransferOrderIdRoute: typeof CheckoutTransferOrderIdRoute
+  ReadSlugIssueRoute: typeof ReadSlugIssueRoute
   ApiAdminProofOrderIdRoute: typeof ApiAdminProofOrderIdRoute
   ApiFilesDownloadTokenRoute: typeof ApiFilesDownloadTokenRoute
+  OutSlugIssueProviderRoute: typeof OutSlugIssueProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -554,6 +619,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/personal': {
+      id: '/guides/personal'
+      path: '/guides/personal'
+      fullPath: '/guides/personal'
+      preLoaderRoute: typeof GuidesPersonalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stories/': {
+      id: '/stories/'
+      path: '/stories'
+      fullPath: '/stories/'
+      preLoaderRoute: typeof StoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stories/$slug': {
+      id: '/stories/$slug'
+      path: '/stories/$slug'
+      fullPath: '/stories/$slug'
+      preLoaderRoute: typeof StoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/product/$id': {
       id: '/admin/product/$id'
       path: '/product/$id'
@@ -589,6 +675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutTransferOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/read/$slug/$issue': {
+      id: '/read/$slug/$issue'
+      path: '/read/$slug/$issue'
+      fullPath: '/read/$slug/$issue'
+      preLoaderRoute: typeof ReadSlugIssueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/proof/$orderId': {
       id: '/api/admin/proof/$orderId'
       path: '/api/admin/proof/$orderId'
@@ -601,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/api/files/download/$token'
       fullPath: '/api/files/download/$token'
       preLoaderRoute: typeof ApiFilesDownloadTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/out/$slug/$issue/$provider': {
+      id: '/out/$slug/$issue/$provider'
+      path: '/out/$slug/$issue/$provider'
+      fullPath: '/out/$slug/$issue/$provider'
+      preLoaderRoute: typeof OutSlugIssueProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -646,13 +746,18 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutVerifyRoute: CheckoutVerifyRoute,
   DownloadTokenRoute: DownloadTokenRoute,
   GuidesSlugRoute: GuidesSlugRoute,
+  GuidesPersonalRoute: GuidesPersonalRoute,
+  StoriesSlugRoute: StoriesSlugRoute,
   GuidesIndexRoute: GuidesIndexRoute,
+  StoriesIndexRoute: StoriesIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiCoversProductIdRoute: ApiCoversProductIdRoute,
   ApiPaystackWebhookRoute: ApiPaystackWebhookRoute,
   CheckoutTransferOrderIdRoute: CheckoutTransferOrderIdRoute,
+  ReadSlugIssueRoute: ReadSlugIssueRoute,
   ApiAdminProofOrderIdRoute: ApiAdminProofOrderIdRoute,
   ApiFilesDownloadTokenRoute: ApiFilesDownloadTokenRoute,
+  OutSlugIssueProviderRoute: OutSlugIssueProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -449,3 +449,34 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Story pages: dark and cinematic. Same tokens with night values, so */
+/* every utility and component above works unchanged inside .night.   */
+/* Text pairs keep 4.5:1 or better on the near-black background.      */
+/* ------------------------------------------------------------------ */
+.night {
+  --color-paper: #0b0b0c;
+  --color-paper-2: #17171a;
+  --color-surface: #141416;
+  --color-ink: #f3eee4;
+  --color-muted: #b9b2a6;
+  --color-subtle: #9a9389;
+  --color-line: #2a2a2e;
+  --color-field: #6b665e;
+  --color-accent: #f5c518;
+  --color-accent-hover: #ffd23f;
+  --color-accent-soft: #2a240c;
+  --color-accent-fg: #0b0b0c;
+  color-scheme: dark;
+}
+.night h1,
+.night h2,
+.night .font-display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+/* No light flash when a phone over-scrolls past a dark page. */
+html:has(.night) {
+  background: #0b0b0c;
+}

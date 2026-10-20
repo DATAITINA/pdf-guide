@@ -73,13 +73,14 @@ export const exportWaitlistCsv = createServerFn({ method: "POST" })
       email: string;
       whatsapp: string | null;
       position: number;
-      code: string;
-      status: string;
+      code: string | null;
+      status: string | null;
       created_at: string;
     }>(
+      // Left join: story "tell me when it drops" signups have no voucher.
       `select e.email, e.whatsapp, e.position, v.code, v.status, e.created_at::text
        from waitlist_entries e
-       join vouchers v on v.waitlist_entry_id = e.id
+       left join vouchers v on v.waitlist_entry_id = e.id
        where e.topic_id = $1
        order by e.position asc`,
       [data.topicId],
@@ -87,7 +88,7 @@ export const exportWaitlistCsv = createServerFn({ method: "POST" })
     const header = "email,whatsapp,position,code,voucher_status,joined_at\n";
     const body = rows
       .map((r) =>
-        [r.email, r.whatsapp ?? "", r.position, r.code, r.status, r.created_at]
+        [r.email, r.whatsapp ?? "", r.position, r.code ?? "", r.status ?? "", r.created_at]
           .map((c) => `"${String(c).replace(/"/g, '""')}"`)
           .join(","),
       )
