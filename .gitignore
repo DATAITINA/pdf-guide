@@ -3,3 +3,8 @@ node_modules/
 .github_repo
 .env
 .env.*
+
+# Full story art: never commit or deploy (only free pages + blurred teaser go to public/)
+art-src/
+# Local Vercel build output
+.vercel/
