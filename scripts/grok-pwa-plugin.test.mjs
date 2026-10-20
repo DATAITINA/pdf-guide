@@ -117,6 +117,17 @@ test("platform chrome overwrites share-card metas and always sets og:title", () 
   assert.doesNotMatch(out, /property="og:image"/);
 });
 
+test("a page with its own share image keeps its share-card metas", () => {
+  const html =
+    '<html><head><title>Danfo 13</title><meta property="og:title" content="Danfo 13 — Cairn"><meta property="og:image" content="https://trycairn.vercel.app/stories/danfo-13/share.jpg"><meta name="twitter:card" content="summary_large_image"></head></html>';
+  const out = injectGrokPwaHead(html, { appName: "Cairn", host: "trycairn.vercel.app", cwd: BLANK_CWD });
+  assert.match(out, /property="og:title" content="Danfo 13 — Cairn"/);
+  assert.match(out, /property="og:image" content="https:\/\/trycairn\.vercel\.app\/stories\/danfo-13\/share\.jpg"/);
+  assert.equal(out.split('property="og:title"').length - 1, 1);
+  assert.equal(out.split('property="og:image"').length - 1, 1);
+  assert.equal(out.split('name="twitter:card"').length - 1, 1);
+});
+
 test("does not duplicate twitter:card or og:title", () => {
   const once = injectGrokPwaHead("<html><head><title>Hello World</title></head></html>");
   const twice = injectGrokPwaHead(once);

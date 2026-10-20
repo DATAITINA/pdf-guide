@@ -463,7 +463,10 @@ export function injectGrokPwaHead(html, ctx = {}) {
     host,
     documentTitle,
   );
-  let next = stripShareMetaTags(html);
+  // A page that sets its own share image (e.g. each story's cover card) keeps its share tags.
+  // Every other page gets the site-wide card, as before.
+  const pageHasShareCard = /<meta\b[^>]*\bproperty\s*=\s*["']og:image["']/i.test(html);
+  let next = pageHasShareCard ? html : stripShareMetaTags(html);
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
@@ -473,10 +476,12 @@ export function injectGrokPwaHead(html, ctx = {}) {
     })
     .map(([, tag]) => tag);
 
-  next = insertAfterHeadOpen(
-    next,
-    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
-  );
+  if (!pageHasShareCard) {
+    next = insertAfterHeadOpen(
+      next,
+      grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
+    );
+  }
 
   if (!wantsGrokBanner(host)) {
     // Store's own domain: no Grok banner script.
