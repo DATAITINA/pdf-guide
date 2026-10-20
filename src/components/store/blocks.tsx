@@ -44,7 +44,7 @@ export function FaqList({ items }: { items: Faq[] }) {
   );
 }
 
-/** Link to the personal-guide request form on the home page, from anywhere. */
+/** Link to the personal-guide request form on /guides/personal, from anywhere. */
 export function RequestGuideLink({
   children = "Request a personal guide",
   className,
@@ -53,7 +53,7 @@ export function RequestGuideLink({
   className?: string;
 }) {
   return (
-    <Link to="/" hash="request-guide" className={className}>
+    <Link to="/guides/personal" hash="request-guide" className={className}>
       {children}
     </Link>
   );

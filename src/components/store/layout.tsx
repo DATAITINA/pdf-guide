@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RequestGuideLink } from "./blocks";
 
 const navLinks = [
+  { to: "/stories" as const, label: "Stories" },
   { to: "/guides" as const, label: "Ready-made guides" },
   { to: "/about" as const, label: "About" },
   { to: "/faq" as const, label: "FAQ" },
@@ -121,6 +122,16 @@ export function StoreFooter({ settings }: { settings: StoreSettings }) {
         <div>
           <p className="eyebrow text-subtle">Explore</p>
           <ul className="mt-2">
+            <li>
+              <Link to="/stories" className={footerLink}>
+                Stories and comics
+              </Link>
+            </li>
+            <li>
+              <Link to="/guides/personal" className={footerLink}>
+                Personal guides
+              </Link>
+            </li>
             <li>
               <Link to="/guides" className={footerLink}>
                 Ready-made guides
