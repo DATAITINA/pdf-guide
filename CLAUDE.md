@@ -14,7 +14,25 @@ their situation plays (the doorway). Then Cairn helps them follow through with W
 - Owner: solo founder, small budget. Keep the system simple and cheap to run.
 - Live: https://trycairn.vercel.app · Repo: DATAITINA/pdf-guide (public) · Vercel project `fieldnotepdf`.
 
-## The goal: retention, not clicks
+## Current priority (owner decision, 2026-10-20): stories and comics first
+
+Cairn is becoming a premium mobile site for original African stories and comics. Tagline:
+"Stories that won't let you go." The guide engine (M1 onward, below) is **paused, not cancelled**,
+and the existing guide store keeps working under `/guides`.
+
+- Stories live in `src/content/stories.ts` (no database). Images go in `public/stories/<slug>/`, made by
+  `scripts/stories/prepare_images.py` from the git-ignored `art-src/`. See README → "Adding a story".
+- **Only free preview pages and one pre-blurred teaser per issue may be public.** Never commit full
+  pages or PDFs. `src/content/stories.test.ts` enforces this.
+- Payment and delivery happen on Selar (₦) and Gumroad ($). No payment code for stories.
+- Analytics: Vercel Web Analytics, page views only (Hobby). Funnel steps are page views: the reader,
+  `/read/…/lock` (virtual) and `/out/…/<provider>`. `RouteAnalytics` in `__root.tsx` sends exactly one
+  view per page.
+- "Next issue" email signups reuse the waitlist tables (topic "<Story>: next issue", no voucher).
+- Story pages use the dark `.night` theme (`src/styles.css`). Guide pages keep the light theme.
+- Reminder: Vercel Hobby is non-commercial. Upgrade to Pro before the first real comic sale.
+
+## The goal: retention, not clicks (guide engine, paused)
 
 Build these five systems, in this priority order:
 
